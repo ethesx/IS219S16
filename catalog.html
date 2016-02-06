@@ -1,14 +1,32 @@
 <head>
-  <title>catalog</title>
+    <title>Catalog</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
 
-  {{> hello}}
+<div class="container">
+    <form class="isbnSearchForm">
+        <header>
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" name="isbn" placeholder="ISBN # to search for"/>
+            <button type="submit" id="searchButton" >Search</button>
+        </header>
+    </form>
+
+    <header>
+        <h1>Results</h1>
+    </header>
+
+    <ul>
+        {{#each results}}
+            {{> result}}
+        {{/each}}
+    </ul>
+</div>
+
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+
+<template name="result">
+    <li>{{title}}, {{age}}, {{isbn}}</li>
 </template>

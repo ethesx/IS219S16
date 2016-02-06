@@ -1,23 +1,34 @@
+Catalog = new Mongo.Collection("catalog");
+
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
-    }
-  });
+    // This code only runs on the client
+    Template.body.helpers({
+        results: function () {
+            return Catalog.find({});
+        }
+    });
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
+    Template.body.events({
+
+        "submit .isbnSearchForm": function (event) {
+            // Prevent default browser form submit
+            event.preventDefault();
+
+            // Get value from form element
+            var text = event.target.isbn;
+
+            // Find a title from the collection
+           /*
+            Catalog.find({
+                isbn: text
+            });
+*/
+            // Clear form
+            event.target.isbn = "cleared";
+
+            console.log("cleared isbn text");
+        }
+    });
 }
 
-if (Meteor.isServer) {
-  Meteor.startup(function () {
-    // code to run on server at startup
-  });
-}
