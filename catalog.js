@@ -16,18 +16,14 @@ if (Meteor.isClient) {
             event.preventDefault();
 
             // Get value from form element
-            var text = event.target.isbn;
+            var text = event.target.isbn.value;
 
             // Find a title from the collection
-           /*
             Catalog.find({
                 isbn: text
             });
-*/
             // Clear form
-            event.target.isbn = "cleared";
-
-            console.log("cleared isbn text");
+            event.target.isbn.value = "";
         }
     });
 }
