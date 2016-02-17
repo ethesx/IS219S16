@@ -25,7 +25,7 @@ if (Meteor.isClient) {
             // Clear form
             event.target.isbn.value = "";
         },
-        "click #aLookup" : function(event, target){
+        "click #aLookup, click #aHome" : function(event, target){
             console.debug("Lookup fired");
             Utility.clearContent(target);
             Blaze.renderWithData(Template.lookup, {my: "data"}, target.$("#content").get(0))
