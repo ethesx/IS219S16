@@ -1,0 +1,100 @@
+<template name="lookup">
+    <div id="lookup" class="container">
+        <form class="isbnSearchForm">
+            <div class="input-group" data-toggle="tooltip"
+                 title="Enter the ISBN (9 or 13) you'd like to lookup or press scan to read a barcode">
+                <span class="input-group-addon">ISBN</span>
+                <input id="isbn" class="form-control" aria-label="ISBN # to search for" type="text">
+            <span class="input-group-btn">
+                <button id="searchButton" class="btn btn-default" type="submit">Search</button>
+            </span>
+            </div>
+        </form>
+
+
+        <div class="page-header alert alert-success">
+            <h1>The Little Prince</h1>
+        </div>
+
+
+        <div aria-multiselectable="true" role="tablist" id="accordion" class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                           aria-expanded="true" aria-controls="collapseOne">
+                            commonsensemedia.org
+                        </a>
+                    </h4>
+                </div>
+                <div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse in" id="collapseOne">
+                    <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <td><h3>Ages</h3></td>
+                                <td>
+                                    <h3><span class="label label-success">10+</span></h3>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h4>Author</h4></td>
+                                <td>Cowboy Beebop</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Genre</h4></td>
+                                <td>Fantasy</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Topics</h4></td>
+                                <td>Magic and fantasy, Adventures, Friendship</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Publisher</h4></td>
+                                <td>Harcourt Brace</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            www.barnesandnoble.com
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                    <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <td><h3>Ages</h3></td>
+                                <td>
+                                    <h3><span class="label label-success">10+</span></h3>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h4>Author</h4></td>
+                                <td>Cowboy Beebop</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Genre</h4></td>
+                                <td>Fantasy</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Topics</h4></td>
+                                <td>Different topic</td>
+                            </tr>
+                            <tr>
+                                <td><h4>Publisher</h4></td>
+                                <td>Harcourt Brace</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

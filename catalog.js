@@ -28,17 +28,21 @@ if (Meteor.isClient) {
             // Clear form
             event.target.isbn.value = "";
         },
-        "click #aLookup" : function(){
+        "click #aLookup" : function(event, target){
             console.debug("Lookup fired");
+            Blaze.renderWithData(Template.lookup, {my: "data"}, target.$("#content").get(0))
         },
         "click #aUpload" : function(){
             console.debug("Upload fired");
+            Blaze.renderWithData(Template.upload, {my: "data"}, target.$("#content").get(0))
         },
         "click #aScan" : function(){
             console.debug("Scan fired");
+            Blaze.renderWithData(Template.scan, {my: "data"}, target.$("#content").get(0))
         },
         "click #aResults" : function(){
             console.debug("Results fired");
+            Blaze.renderWithData(Template.results, {my: "data"}, target.$("#content").get(0))
         },
     });
 }
