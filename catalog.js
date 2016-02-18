@@ -45,13 +45,29 @@ if (Meteor.isClient) {
             Utility.clearContent(target);
             Blaze.renderWithData(Template.results, {my: "data"}, target.$("#content").get(0))
         },
+        "change #uploadFile" : function(event, target) {
+            console.debug(target);
+            console.debug("JQuery file input target" + $(target));
+            let input = target.$("#uploadFile"),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            //TODO reference constant for file value object
+            Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
+
+
+        }
     });
 
     var Utility = {
 
         clearContent(target){
             target.$("#content").empty();
-        }
+        },
+        populateFileUploadValue(obj, dataObj) {
+            console.debug("Populating file upload: numFiles = " + dataObj.numFiles + " label = " + dataObj.label);
+            console.debug(obj);
+            obj.get(0).value = dataObj.label;
+        },
     };
 }
 

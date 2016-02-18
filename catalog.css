@@ -1,4 +1,4 @@
-body{
+body {
     padding: 70px 0 0 0;
 }
 
@@ -9,9 +9,39 @@ body{
     /*background: white;*/
 }
 
-.isbnSearchForm{
+.isbnSearchForm {
     padding: 20px 0 0 0;
 
 }
 
+.uploadFile {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    opacity: 0;
+    background-color: transparent;
+    color: transparent;
+}
 
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
