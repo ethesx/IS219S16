@@ -2,21 +2,207 @@
 
     <div id="upload" class="container">
 
+        <p class="page-heading lead">
+        <h1><b>C</b>omma <b>S</b>eparated <b>V</b>alue upload
+            <small>Resolve many titles at once.</small>
+        </h1>
 
-            <h4>CSV Upload</h4>
-            <div class="input-group">
-                <span class="input-group-btn">
-                    <span class="btn btn-primary btn-file">
-                        Browse&hellip; <input type="file" id="uploadFile">
-                    </span>
+        </p>
+        <div class="well">
+            <p>The CSV is a simple text file, using commas to separate values. A usable CSV file will have the format
+                listed below. Please keep in mind
+                the values should be provided in the following order:</p>
+            <p>* Required</p>
+            <p>
+            <ol>
+                <li>Title *</li>
+                <li>ISBN *</li>
+                <li>Publisher</li>
+                <li>Author</li>
+                <li>Translator</li>
+            </ol>
+            </p>
+            <p class="lead">Example:
+            <p><code>The Little Prince,978-0156012195,Mariner Books,Antoine de Saint-Exupéry,Richard Howard</code></p>
+            </p>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-btn">
+                <span class="btn btn-primary btn-file">
+                    Browse&hellip; <input type="file" id="uploadFile">
                 </span>
-                <input type="text" class="form-control" readonly id="uploadFileValue">
-            </div>
-            <span class="help-block">
-                ...add text help
             </span>
+            <input type="text" class="form-control" readonly id="uploadFileValue">
+        </div>
+        <span class="help-block">
+            Select the location of the CSV file
+        </span>
+
+        <div class="panel panel-default panel-primary">
+            <div class="panel-heading lead">Results</div>
+            <div class="panel-body">
+                <!--<div class="row">
+                    <div class="col-xs-6">Total items</div>
+                    <div class="col-xs-6">9746</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6 col-xs-offset-0">Tagged items</div>
+                    <div class="col-xs-6 col-xs-offset-0">6938</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6 col-xs-offset-0">Review items</div>
+                    <div class="col-xs-6 col-xs-offset-0">2808</div>
+                </div>-->
 
 
+                <table class="table uploadItemTable">
+                    <thead class="h4">
+                    <tr>
+                        <td>Total items</td>
+                        <td>9746</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-indent: 2%"><a href="#tagged">Tagged items</a></td>
+                        <td>6938</td>
+                    </tr>
+                    <tr>
+                        <td style="text-indent: 2%"><a href="#review">Review items</a></td>
+                        <td>2808</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!--<div class="panel panel-default panel-collapse">
+                    <div class="panel-heading">Tagged items</div>
+                    <div class="panel-body">
+                        Some information
+                    </div>
+                </div>-->
+                <div class="panel panel-success" id="tagged">
+                    <div class="panel-heading lead">Tagged items</div>
+                    <div class="panel-body table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="h4">
+                        <tr>
+                            <td>Title</td>
+                            <td>Age</td>
+                            <td>ISBN</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>The Little Prince</td>
+                            <td>10+</td>
+                            <td>978-1514861264</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Stars Above</td>
+                            <td>14+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Martin Luther King - A Biography</td>
+                            <td>14+</td>
+                            <td>978-123457789</td>
+                        </tr>
+                        <tr>
+                            <td>Finding Nemo</td>
+                            <td>7+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        <tr>
+                            <td>The Little Prince</td>
+                            <td>10+</td>
+                            <td>978-1514861264</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Stars Above</td>
+                            <td>14+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Martin Luther King - A Biography</td>
+                            <td>14+</td>
+                            <td>978-123457789</td>
+                        </tr>
+                        <tr>
+                            <td>Finding Nemo</td>
+                            <td>7+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        <tr>
+                            <td>The Little Prince</td>
+                            <td>10+</td>
+                            <td>978-1514861264</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Stars Above</td>
+                            <td>14+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        <tr class="danger">
+                            <td>Martin Luther King - A Biography</td>
+                            <td>14+</td>
+                            <td>978-123457789</td>
+                        </tr>
+                        <tr>
+                            <td>Finding Nemo</td>
+                            <td>7+</td>
+                            <td>978-0987654321</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                        </div>
+
+                </div>
+
+                <div class="panel panel-warning" id="review">
+                    <div class="panel-heading lead">Review items</div>
+                    <div class="panel-body table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="h4">
+                            <tr>
+                                <td>Title</td>
+                                <td>Age</td>
+                                <td>ISBN</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Dune</td>
+                                <td></td>
+                                <td>978-1514861264</td>
+                            </tr>
+                            <tr>
+                                <td>Maze Runner</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Monster stories</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Sure thing</td>
+                                <td></td>
+                                <td>978-0987654321</td>
+                            </tr>
+                            <tr>
+                                <td>Torrent home</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
     </div>
 </template>

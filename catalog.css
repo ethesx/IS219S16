@@ -45,3 +45,19 @@ body {
     cursor: inherit;
     display: block;
 }
+
+.uploadItemTable tr :last-child{
+    width:75%;
+}
+.uploadItemTable tr :first-child{
+    min-width:125px;
+}
+
+@-moz-document url-prefix() {
+    fieldset { display: table-cell; }
+}
+
+.table-responsive{
+
+    max-height:20em;
+}
