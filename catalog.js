@@ -1,5 +1,22 @@
 Catalog = new Mongo.Collection("catalog");
 
+if(Meteor.isCordova){
+
+    Meteor.startup(function () {
+        cordova.plugins.barcodeScanner.scan(
+            function (result) {
+                alert("We got a barcode\n" +
+                    "Result: " + result.text + "\n" +
+                    "Format: " + result.format + "\n" +
+                    "Cancelled: " + result.cancelled);
+            },
+            function (error) {
+                alert("Scanning failed: " + error);
+            }
+        );
+    });
+}
+
 if (Meteor.isClient) {
 
     // This code only runs on the client
@@ -35,11 +52,11 @@ if (Meteor.isClient) {
             Utility.clearContent(target);
             Blaze.renderWithData(Template.upload, {my: "data"}, target.$("#content").get(0))
         },
-        "click #aScan" : function(event, target){
+        /*"click #aScan" : function(event, target){
             console.debug("Scan fired");
             Utility.clearContent(target);
             Blaze.renderWithData(Template.scan, {my: "data"}, target.$("#content").get(0))
-        },
+        },*/
         "click #aResults" : function(event, target){
             console.debug("Results fired");
             Utility.clearContent(target);
@@ -70,4 +87,6 @@ if (Meteor.isClient) {
         },
     };
 }
+
+
 
