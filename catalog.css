@@ -57,7 +57,7 @@ body {
     fieldset { display: table-cell; }
 }
 
-.table-responsive{
+.table-responsive #upload{
 
     max-height:20em;
 }
