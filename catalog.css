@@ -57,7 +57,7 @@ body {
     fieldset { display: table-cell; }
 }
 
-.table-responsive #upload{
+#upload .table-responsive {
 
     max-height:20em;
 }
@@ -68,3 +68,19 @@ body {
     height:auto;
     overflow:hidden;
 }*/
+
+@media (max-width: 768px) {
+    #resultBodyDiv{
+        max-height: 30em;
+        overflow:auto;
+    }
+
+}
+
+@media (min-width: 992px) {
+    #resultBodyDiv{
+        max-height: 50em;
+        overflow:auto;
+    }
+
+}
