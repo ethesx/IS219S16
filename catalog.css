@@ -5,6 +5,8 @@ body {
 .container {
     margin: 0 auto;
     min-height: 100%;
+    padding-left:5px;
+    padding-right:5px;
 }
 
 .container #content{
