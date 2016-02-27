@@ -71,7 +71,7 @@ body {
 
 @media (max-width: 768px) {
     #resultBodyDiv{
-        max-height: 30em;
+        max-height: 28em;
         overflow:auto;
     }
 
@@ -83,4 +83,12 @@ body {
         overflow:auto;
     }
 
+}
+
+#results button{
+    margin:2em 2em 1em 0;
+}
+
+#processNumBadge{
+    margin-left:3em;
 }
