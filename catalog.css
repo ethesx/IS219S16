@@ -101,3 +101,7 @@ body {
 #uploadResultPanel{
     margin-top:3em;
 }
+
+#processTable td:first-child, #processTable th:first-child{
+    text-align: center;
+}
