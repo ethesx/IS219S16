@@ -69,6 +69,11 @@ body {
     overflow:hidden;
 }*/
 
+@media (max-width: 460px) {
+    h1{
+        font-size: 16pt;
+    }
+}
 @media (max-width: 768px) {
     #resultBodyDiv{
         max-height: 28em;
@@ -91,4 +96,8 @@ body {
 
 #processNumBadge{
     margin-left:3em;
+}
+
+#uploadResultPanel{
+    margin-top:3em;
 }
