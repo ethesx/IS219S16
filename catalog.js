@@ -1,5 +1,19 @@
 Catalog = new Mongo.Collection("catalog");
 
+if(Meteor.isServer){
+
+    Meteor.methods({
+        'getData' : function (isbn){
+            let url = "aHR0cDovL3NlYXJjaC5iYXJuZXNhbmRub2JsZS5jb20vYm9va3NlYXJjaC9pc2JuSW5xdWlyeS5hc3A/ej15JkVBTj0+";
+            url = new Buffer(url, 'base64').toString();
+            url = url.substring(0,url.length-1) +isbn;
+            let websiteData = Scrape.url(url);
+            return(websiteData);
+          },
+
+    })
+
+}
 if(Meteor.isCordova){
 
     Meteor.startup(function () {
@@ -28,7 +42,7 @@ if (Meteor.isClient) {
 
     Template.body.events({
 
-        "submit .isbnSearchForm": function (event) {
+        "submit .isbnSearchForm": function (event, target) {
             // Prevent default browser form submit
             event.preventDefault();
 
@@ -41,6 +55,25 @@ if (Meteor.isClient) {
             });
             // Clear form
             event.target.isbn.value = "";
+            Meteor.call("getData", text,
+                function (error, result) {
+                    if (error) {
+                        console.log(error.reason);
+                        return;
+                    }
+                    console.debug("successful callback");
+
+                    var doc = $($.parseHTML(result));
+                    var data = doc.find("#ProductDetailsTab dt, #ProductDetailsTab dd");
+                    data.each(function(i){
+                        var tag = "";
+                        if((tag = this.tagName) === "DT")
+                            console.log(this.textContent);
+                        }
+                    );
+                    return data;
+                }
+            )
         },
         "click #aLookup, click #aHome" : function(event, target){
             console.debug("Lookup fired");
@@ -86,7 +119,27 @@ if (Meteor.isClient) {
             obj.get(0).value = dataObj.label;
         },
     };
+
+    var DataSlog = {
+
+        retrieve : function(isbn) {
+
+
+
+           /* $.ajax({
+                url: url,
+                crossDomain : false,
+                headers : {"Access-Control-Request-Headers" : "Access-Control-Allow-Origin:*"},
+                //contentType : "text/plain",
+                success: function(){
+                    let sub = data.substr(0, 200);
+                    console.debug("ATA: "+sub);
+                    return ( "Load was performed. Retrieved: " + sub);
+                },
+                dataType: "html"
+            });*/
+
+        },
+    };
 }
-
-
 
