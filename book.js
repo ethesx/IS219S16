@@ -7,7 +7,8 @@ BNTermEnum = {
     SERIES : "Series",
     DESC : "Edition description",
     PAGE : "Pages",
-    LEXILE : "Lexile"
+    LEXILE : "Lexile",
+    BN : "BN"
 };
 
 Book =  function(title, age, publisher, isbn, marked) {
@@ -17,7 +18,9 @@ Book =  function(title, age, publisher, isbn, marked) {
     this.publisher = publisher;
     this.isbn = isbn;
     this.marked = marked;
-
+    this.origin;
+    this.markedDate;
+    this.modifiedDate;
 }
 
 BNBook = function () {
@@ -25,6 +28,7 @@ BNBook = function () {
     this.lexile;
     this.page;
     this.pubDate;
+    this.origin = BNTermEnum.BN;
 
     this.populateFromSite = function populateFromSite(term, value) {
 
