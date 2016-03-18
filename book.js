@@ -21,7 +21,7 @@ Book =  function(title, age, publisher, isbn, marked) {
     this.origin;
     this.markedDate;
     this.modifiedDate;
-}
+};
 
 BNBook = function () {
 
