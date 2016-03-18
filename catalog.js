@@ -64,12 +64,15 @@ if (Meteor.isClient) {
             text = new RegExp(["^", text.trim(), "$"].join(""), "i");
 
             // Find a title or isbn from the collection
-            var foundBooks = Catalog.find({$or :[{"isbn": text},{ "title": text}]}, {_id:0});
+            var foundBooks = Catalog.find({$or: [{"isbn": text}, {"title": text}]}, {_id: 0});
+
+            //Set as return to below call
+            var bookReport = new Array();
             // Clear form
             event.target.isbn.value = "";
 
             //If we don't already have details on this book
-            if(foundBooks.count() === 0) {
+            if (foundBooks.count() === 0) {
                 Meteor.call("getData", text,
                     function (error, result) {
                         if (error) {
@@ -79,7 +82,7 @@ if (Meteor.isClient) {
                         console.debug("successful callback");
                         //TODO create func to iterate over available feeds
                         var doc = $($.parseHTML(result));
-                        var bookReport = new Array();
+
 
                         //TODO BN feed specific break me out
                         var data = doc.find("#prodSummary > h1[itemprop], #ProductDetailsTab dt, #ProductDetailsTab dd");
@@ -106,24 +109,25 @@ if (Meteor.isClient) {
                         var insertedBook = Catalog.insert(bookReport);
                         //FIXME Looks to still return _id
                         //TODO perform
-                        foundBooks = Catalog.find({id : insertedBook._id}, {_id:0});
+                        foundBooks = Catalog.find({id: insertedBook._id}, {_id: 0});
 
                         //iterate through the cursor, create BookResult for return
                         //TODO make this a server function
-                        foundBooks.forEach(function(){
-                            foundBooks.push(book);
+                        foundBooks.forEach(function () {
+                            bookReport.push(book);
                         });
-                        return foundBooks;
+                        return bookReport;
                     }
                 )
             }
-            else
+            else {
                 //iterate through the cursor, create BookResult for return
                 //TODO make this a server function
-                foundBooks.forEach(function(book){
-                    foundBooks.push(book);
+                foundBooks.forEach(function (book) {
+                    bookReport.push(book);
                 });
-                return foundBooks;
+            }
+            return bookReport;
         },
         "click #aLookup, click #aHome" : function(event, target){
             console.debug("Lookup fired");
