@@ -3,16 +3,28 @@ Catalog = new Mongo.Collection("catalog");
 if(Meteor.isServer){
 
     Meteor.methods({
-        'getData' : function (isbn){
-            let url = "aHR0cDovL3NlYXJjaC5iYXJuZXNhbmRub2JsZS5jb20vYm9va3NlYXJjaC9pc2JuSW5xdWlyeS5hc3A/ej15JkVBTj0+";
-            url = new Buffer(url, 'base64').toString();
-            url = url.substring(0,url.length-1) +isbn;
-            //let websiteData = Scrape.url(url);
+        'getData' : function (searchFor){
+            //TODO static site data return for testing
             let websiteData = ConstantsTest.websiteData;
+            let books = [];
+
+            getOrigin().forEach(function(item){
+                let url = item.url;
+                url = new Buffer(url, 'base64').toString();
+                url = url.substring(0,url.length-1) + searchFor;
+                //TODO add call return parsed data object, add to books[]
+                //websiteData = Scrape.url(url);
+
+            });
+
             return(websiteData);
           },
-
     })
+
+    //retrieve sources for iteration
+    function getOrigin(){
+        return Constants.origin;
+    };
 
 }
 if(Meteor.isCordova){
@@ -52,13 +64,12 @@ if (Meteor.isClient) {
             text = new RegExp(["^", text.trim(), "$"].join(""), "i");
 
             // Find a title or isbn from the collection
-            var foundBook = Catalog.findOne({$or :[{"isbn": text},{ "title": text}]}, {_id:0});
-
+            var foundBooks = Catalog.find({$or :[{"isbn": text},{ "title": text}]}, {_id:0});
             // Clear form
             event.target.isbn.value = "";
 
             //If we don't already have details on this book
-            if(!foundBook) {
+            if(foundBooks.count() === 0) {
                 Meteor.call("getData", text,
                     function (error, result) {
                         if (error) {
@@ -68,6 +79,8 @@ if (Meteor.isClient) {
                         console.debug("successful callback");
                         //TODO create func to iterate over available feeds
                         var doc = $($.parseHTML(result));
+                        var bookReport = new Array();
+
                         //TODO BN feed specific break me out
                         var data = doc.find("#prodSummary > h1[itemprop], #ProductDetailsTab dt, #ProductDetailsTab dd");
                         var book = new BNBook();
@@ -89,15 +102,28 @@ if (Meteor.isClient) {
                             //});
                         }
                         console.log(book);
-                        var insertedBook = Catalog.insert(book);
+                        bookReport.push(book);
+                        var insertedBook = Catalog.insert(bookReport);
                         //FIXME Looks to still return _id
-                        foundBook = Catalog.findOne({id : insertedBook._id}, {_id:0});
-                        return foundBook;
+                        //TODO perform
+                        foundBooks = Catalog.find({id : insertedBook._id}, {_id:0});
+
+                        //iterate through the cursor, create BookResult for return
+                        //TODO make this a server function
+                        foundBooks.forEach(function(){
+                            foundBooks.push(book);
+                        });
+                        return foundBooks;
                     }
                 )
             }
             else
-                return foundBook;
+                //iterate through the cursor, create BookResult for return
+                //TODO make this a server function
+                foundBooks.forEach(function(book){
+                    foundBooks.push(book);
+                });
+                return foundBooks;
         },
         "click #aLookup, click #aHome" : function(event, target){
             console.debug("Lookup fired");
