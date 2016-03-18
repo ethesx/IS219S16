@@ -144,18 +144,5 @@ if (Meteor.isClient) {
         },
     };
 
-    var DataSlog = {
-
-        fromSiteConveter : function(data, origin) {
-
-            switch (origin){
-                case "BN" :
-                    break;
-                default:
-                    break;
-
-            }
-        },
-    };
 }
 
