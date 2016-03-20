@@ -5,25 +5,96 @@ if(Meteor.isServer){
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
-            let websiteData = ConstantsTest.websiteData;
-            let books = [];
+            let data = ConstantsTest.websiteData;
 
-            getOrigin().forEach(function(item){
-                let url = item.url;
-                url = new Buffer(url, 'base64').toString();
-                url = url.substring(0,url.length-1) + searchFor;
-                //TODO add call return parsed data object, add to books[]
-                //websiteData = Scrape.url(url);
+            if(searchFor) {
+                searchFor = new RegExp(["^", searchFor.trim(), "$"].join(""), "i");
 
-            });
+                var bookReport = new BookReport();
+                var book;
+                // Find a title or isbn from the collection
+                var foundBookReport = Catalog.find({$or: [{"isbn": searchFor}, {"title": searchFor}]}, {_id: 0}).fetch();
 
-            return(websiteData);
-          },
+                //If we don't already have details on this book
+                if (foundBookReport.length === 0){//.count() === 0) {
+                    getOrigin().forEach(function (item) {
+                        let url = item.url;
+                        url = new Buffer(url, 'base64').toString();
+                        url = url.substring(0, url.length - 1) + searchFor;
+                        //data = Scrape.url(url);
+                        book = getParsedBookData(data, item.type);
+                        bookReport.books.push(book);
+                    });
+                    setReportProps(bookReport);
+
+                    var insertedBook = Catalog.insert(bookReport);
+                    //FIXME Looks to still return _id
+                    foundBookReport = Catalog.find({_id: insertedBook}, {_id: 0}).fetch();
+
+                    return foundBookReport;
+                }
+
+                console.log(foundBookReport.books);
+                return foundBookReport;
+            }
+        },
     })
 
     //retrieve sources for iteration
     function getOrigin(){
         return Constants.origin;
+    };
+
+    //
+    function getParsedBookData(result, originType){
+        var book;
+        //FIXME replace with Cheerio ref - Jquery no like backside
+        var doc = $($.parseHTML(result));
+
+        switch (originType) {
+            case Constants.originTypes.BN :
+                book = parseBNData(doc);
+                break;
+            /*case Constants.originTypes.CSM :
+                book = createNewFunc(doc);
+                break;*/
+            default :
+                break;
+        }
+        return book;
+    };
+
+    //Parses source specific data
+    function parseBNData(){
+        var data = doc.find("#prodSummary > h1[itemprop], #ProductDetailsTab dt, #ProductDetailsTab dd");
+        var book = new BNBook();
+
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i]
+            if (item.tagName === "H1") {
+                //console.log(item.textContent);
+                book.title = item.textContent;
+            }
+            else if (item.tagName === "DT") {
+                /* console.log(item.textContent);
+                 console.log(item);*/
+                book.populateFromSite(item.textContent, data[++i].textContent);
+            }
+        }
+        return book;
+    };
+
+    //Sets the props for the common props across all books in the report
+    function setReportProps(bookReport){
+        var firstBook = bookReport.books[0];
+        if(bookReport && firstBook) {
+            if (!title) {
+                bookReport.title = firstBook.title;
+            }
+            if (!isbn) {
+                bookReport.isbn = firstBook.isbn;
+            }
+        }
     };
 
 }
@@ -53,7 +124,13 @@ if (Meteor.isClient) {
 
             // Get value from form element
             var text = event.target.isbn.value;
-            Session.set("search", text);
+            //Session.set("search", text);
+            Meteor.call("getData", text, function(error, result){
+                if(error) {
+                    console.log(error.reason);
+                }
+                console.log("getData callback success");
+            });
             // Clear form
             event.target.isbn.value = "";
         },
@@ -63,74 +140,6 @@ if (Meteor.isClient) {
         searchResults : function(){
             var text = Session.get("search");
             console.log("RAN lookup helper" + text );
-            if(text) {
-                text = new RegExp(["^", text.trim(), "$"].join(""), "i");
-
-                // Find a title or isbn from the collection
-                var foundBooks = Catalog.find({$or: [{"isbn": text}, {"title": text}]}, {_id: 0});
-
-                //Set as return to below call
-                var bookReport = new Array();
-
-                //If we don't already have details on this book
-                if (foundBooks.count() === 0) {
-                    Meteor.call("getData", text,
-                        function (error, result) {
-                            if (error) {
-                                console.log(error.reason);
-                                return;
-                            }
-                            console.debug("successful callback");
-                            //TODO create func to iterate over available feeds
-                            var doc = $($.parseHTML(result));
-
-
-                            //TODO BN feed specific break me out
-                            var data = doc.find("#prodSummary > h1[itemprop], #ProductDetailsTab dt, #ProductDetailsTab dd");
-                            var book = new BNBook();
-
-                            for (var i = 0; i < data.length; i++) {
-                                var item = data[i]
-                                if (item.tagName === "H1") {
-                                    //console.log(item.textContent);
-                                    book.title = item.textContent;
-                                }
-                                else if (item.tagName === "DT") {
-                                    /* console.log(item.textContent);
-                                     console.log(item);*/
-                                    book.populateFromSite(item.textContent, data[++i].textContent);
-                                }
-                                /*else if (this.tagName === "DD"){
-                                 console.log(this.textContent);
-                                 }*/
-                                //});
-                            }
-                            //console.log(book);
-                            bookReport.push(book);
-                            var insertedBook = Catalog.insert(bookReport);
-                            //FIXME Looks to still return _id
-                            //TODO perform
-                            foundBooks = Catalog.find({id: insertedBook._id}, {_id: 0});
-
-                            //iterate through the cursor, create BookResult for return
-                            //TODO make this a server function
-                            foundBooks.forEach(function () {
-                                bookReport.push(book);
-                            });
-                            return bookReport;
-                        }
-                    )
-                }
-                else {
-                    //iterate through the cursor, create BookResult for return
-                    //TODO make this a server function
-                    foundBooks.forEach(function (book) {
-                        bookReport.push(book);
-                    });
-                }
-                console.log(bookReport);
-                return bookReport;
-            }
         },
     });
 
