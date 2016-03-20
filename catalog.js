@@ -48,12 +48,10 @@ if(Meteor.isServer){
     //
     function getParsedBookData(result, originType){
         var book;
-        //FIXME replace with Cheerio ref - Jquery no like backside
-        var doc = $($.parseHTML(result));
 
         switch (originType) {
             case Constants.originTypes.BN :
-                book = parseBNData(doc);
+                book = parseBNData(result);
                 break;
             /*case Constants.originTypes.CSM :
                 book = createNewFunc(doc);
@@ -65,22 +63,17 @@ if(Meteor.isServer){
     };
 
     //Parses source specific data
-    function parseBNData(){
-        var data = doc.find("#prodSummary > h1[itemprop], #ProductDetailsTab dt, #ProductDetailsTab dd");
+    function parseBNData(result){
+        var $ = cheerio.load(result);
+        var data = $("#ProductDetailsTab dt, #ProductDetailsTab dd");
         var book = new BNBook();
-
-        for (var i = 0; i < data.length; i++) {
-            var item = data[i]
-            if (item.tagName === "H1") {
-                //console.log(item.textContent);
-                book.title = item.textContent;
+        book.title =  $("#prodSummary > h1[itemprop]").text();
+        $(data).each(function(i){
+            var item = $(this);
+            if (item.is("dt")) {
+                book.populateFromSite(item.text(), item.next("dd").text());
             }
-            else if (item.tagName === "DT") {
-                /* console.log(item.textContent);
-                 console.log(item);*/
-                book.populateFromSite(item.textContent, data[++i].textContent);
-            }
-        }
+        });
         return book;
     };
 
