@@ -124,12 +124,14 @@ if (Meteor.isClient) {
 
             // Get value from form element
             var text = event.target.isbn.value;
-            //Session.set("search", text);
+
             Meteor.call("getData", text, function(error, result){
                 if(error) {
                     console.log(error.reason);
                 }
                 console.log("getData callback success");
+                //TODO: need to check set Session
+                Session.set("search", result);
             });
             // Clear form
             event.target.isbn.value = "";
