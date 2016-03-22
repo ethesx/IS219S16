@@ -5,32 +5,38 @@ if(Meteor.isServer){
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
-            let data = ConstantsTest.websiteData;
+            //let data = ConstantsTest.websiteData;
 
             if(searchFor) {
-                searchFor = new RegExp(["^", searchFor.trim(), "$"].join(""), "i");
-
+                //TODO add ISBN vs title identifcation
+                var dbSearchTerm = new RegExp(["^", searchFor.trim(), "$"].join(""), "i");
                 var bookReport = new BookReport();
                 var book;
                 // Find a title or isbn from the collection
-                var foundBookReport = Catalog.find({$or: [{"isbn": searchFor}, {"title": searchFor}]}, {_id: 0}).fetch();
+                var foundBookReport = Catalog.find({$or: [{"isbn": dbSearchTerm}, {"title": dbSearchTerm}]}, {_id: 0}).fetch();
 
                 //If we don't already have details on this book
                 if (foundBookReport.length === 0){//.count() === 0) {
-                    getOrigin().forEach(function (item) {
+                    var origins = getOrigin();
+                    //TODO order origins loop by noisbnsupport prop first if searchFor is title
+                    for(var i = 0; i < origins.length; i++){
+                        var item = origins[i];
                         let url = item.url;
                         url = new Buffer(url, 'base64').toString();
-                        url = url.substring(0, url.length - 1) + searchFor;
-                        //data = Scrape.url(url);
+                        url += searchFor;
+                        var data = Scrape.url(url);
                         book = getParsedBookData(data, item.type);
-                        bookReport.books.push(book);
-                    });
-                    setReportProps(bookReport);
 
-                    var insertedBook = Catalog.insert(bookReport);
-                    //FIXME Looks to still return _id
-                    foundBookReport = Catalog.find({_id: insertedBook}, {_id: 0}).fetch();
+                        if(book.title || book.isbn)
+                            bookReport.books.push(book);
+                    }
+                    if(bookReport.books[0]) {
+                        setReportProps(bookReport);
 
+                        var insertedBook = Catalog.insert(bookReport);
+                        //FIXME Looks to still return _id
+                        foundBookReport = Catalog.find({_id: insertedBook}, {_id: 0}).fetch();
+                    }
                     return foundBookReport;
                 }
 
@@ -47,7 +53,7 @@ if(Meteor.isServer){
 
     //
     function getParsedBookData(result, originType){
-        var book;
+        var book = new Book();
 
         switch (originType) {
             case Constants.originTypes.BN :
