@@ -12,91 +12,83 @@
             </div>
         </form>
 
-
+        {{#if searchResults}}
         <div class="page-header alert alert-success">
-            <img id="markedCheck" align="left" src="/check.png" />
-            <h1>The Little Prince </h1>
+            {{#if searchResults.marked}}
+                <img id="markedCheck" align="left" src="/check.png" />
+            {{/if}}
+            <h1>{{searchResults.books.[0].title}}</h1>
         </div>
 
 
         <div aria-multiselectable="true" role="tablist" id="accordion" class="panel-group">
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="headingOne">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
-                           aria-expanded="true" aria-controls="collapseOne">
-                            commonsensemedia.org
-                        </a>
-                    </h4>
-                </div>
-                <div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse in" id="collapseOne">
-                    <div class="panel-body">
-                        <table class="table">
-                            <tr>
-                                <td><h3>Ages</h3></td>
-                                <td>
-                                    <h3><span class="label label-success">10+</span></h3>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h4>Author</h4></td>
-                                <td>Cowboy Beebop</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Genre</h4></td>
-                                <td>Fantasy</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Topics</h4></td>
-                                <td>Magic and fantasy, Adventures, Friendship</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Publisher</h4></td>
-                                <td>Harcourt Brace</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            {{#each searchResults.books}}
 
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="headingTwo">
-                    <h4 class="panel-title">
-                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-                           href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            www.barnesandnoble.com
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                    <div class="panel-body">
-                        <table class="table">
-                            <tr>
-                                <td><h3>Ages</h3></td>
-                                <td>
-                                    <h3><span class="label label-success">10+</span></h3>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h4>Author</h4></td>
-                                <td>Cowboy Beebop</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Genre</h4></td>
-                                <td>Fantasy</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Topics</h4></td>
-                                <td>Different topic</td>
-                            </tr>
-                            <tr>
-                                <td><h4>Publisher</h4></td>
-                                <td>Harcourt Brace</td>
-                            </tr>
-                        </table>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="heading{{@index}}">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{@index}}"
+                                    aria-expanded="true" aria-controls="collapse{{@index}}">
+                                    {{origin}}
+                                </a>
+                            </h4>
+                        </div>
+                        <div aria-labelledby="headingOne" role="tabpanel" class="panel-collapse collapse in" id="collapse{{@index}}">
+                            <div class="panel-body">
+                                <table class="table">
+
+                                    <tr>
+                                        <td><h3>Ages</h3></td>
+                                        <td>
+                                            <h3><span class="label label-success">{{age}}</span></h3>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>Author</h4></td>
+                                        <td>{{author}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>Publisher</h4></td>
+                                        <td>{{publisher}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>Pub date</h4></td>
+                                        <td>{{pubDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>Lexile</h4></td>
+                                        <td>{{lexile}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>ISBN</h4></td>
+                                        <td>{{isbn}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><h4>Pages</h4></td>
+                                        <td>{{page}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {{/each}}
         </div>
+        {{/if}}
     </div>
+</template>
+
+
+<template name="bnBook">
+
+
+
+    {{!-- Aside - possibly iterate over props when prop/name associations are mapped
+{#each searchResults.books}}
+{{#each objectToPairs this}}
+    <tr>
+        <td><h4>{{key}}</h4></td>
+        <td>{{value}}</td>
+    </tr>
+{{/each}}
+{{/each}} --}}
 </template>
