@@ -75,7 +75,7 @@ if(Meteor.isServer){
         var data = $("#ProductDetailsTab dt, #ProductDetailsTab dd");
         var book = new BNBook();
         book.title =  $("#prodSummary > h1[itemprop]").text();
-
+        book.author = $("span.contributors > a").text();
         $(data).each(function(i){
             var item = $(this);
             if (item.is("dt")) {
