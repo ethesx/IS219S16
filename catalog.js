@@ -5,7 +5,7 @@ if(Meteor.isServer){
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
-            //let data = ConstantsTest.websiteData;
+            let data = ConstantsTest.websiteData;
 
             if(searchFor) {
                 //TODO add ISBN vs title identifcation
@@ -13,7 +13,8 @@ if(Meteor.isServer){
                 var bookReport = new BookReport();
                 var book;
                 // Find a title or isbn from the collection
-                var foundBookReport = Catalog.find({$or: [{"isbn": dbSearchTerm}, {"title": dbSearchTerm}]}, {_id: 0}).fetch();
+                //TODO handle multiple results
+                var foundBookReport = Catalog.findOne({$or: [{"isbn": dbSearchTerm}, {"title": dbSearchTerm}]}, {_id: 0});
 
                 //If we don't already have details on this book
                 if (foundBookReport.length === 0){//.count() === 0) {
@@ -24,10 +25,10 @@ if(Meteor.isServer){
                         let url = item.url;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
-                        var data = Scrape.url(url);
+                        //var data = Scrape.url(url);
                         book = getParsedBookData(data, item.type);
 
-                        if(book.title || book.isbn)
+                        if(book.title != undefined || book.isbn != undefined)
                             bookReport.books.push(book);
                     }
                     if(bookReport.books[0]) {
@@ -35,7 +36,7 @@ if(Meteor.isServer){
 
                         var insertedBook = Catalog.insert(bookReport);
                         //FIXME Looks to still return _id
-                        foundBookReport = Catalog.find({_id: insertedBook}, {_id: 0}).fetch();
+                        foundBookReport = Catalog.findOne({_id: insertedBook}, {_id: 0});
                     }
                     return foundBookReport;
                 }
@@ -87,10 +88,10 @@ if(Meteor.isServer){
     function setReportProps(bookReport){
         var firstBook = bookReport.books[0];
         if(bookReport && firstBook) {
-            if (!title) {
+            if (!bookReport.title) {
                 bookReport.title = firstBook.title;
             }
-            if (!isbn) {
+            if (!bookReport.isbn) {
                 bookReport.isbn = firstBook.isbn;
             }
         }
@@ -141,6 +142,7 @@ if (Meteor.isClient) {
         searchResults : function(){
             var text = Session.get("search");
             console.log("RAN lookup helper" + text );
+            return text;
         },
     });
 
