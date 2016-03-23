@@ -17,7 +17,7 @@ if(Meteor.isServer){
                 var foundBookReport = Catalog.findOne({$or: [{"isbn": dbSearchTerm}, {"title": dbSearchTerm}]}, {_id: 0});
 
                 //If we don't already have details on this book
-                if (foundBookReport.length === 0){//.count() === 0) {
+                if (!foundBookReport){//.count() === 0) {
                     var origins = getOrigin();
                     //TODO order origins loop by noisbnsupport prop first if searchFor is title
                     for(var i = 0; i < origins.length; i++){
@@ -41,7 +41,7 @@ if(Meteor.isServer){
                     return foundBookReport;
                 }
 
-                console.log(foundBookReport.books);
+                //console.log(foundBookReport.books);
                 return foundBookReport;
             }
         },
@@ -75,6 +75,7 @@ if(Meteor.isServer){
         var data = $("#ProductDetailsTab dt, #ProductDetailsTab dd");
         var book = new BNBook();
         book.title =  $("#prodSummary > h1[itemprop]").text();
+
         $(data).each(function(i){
             var item = $(this);
             if (item.is("dt")) {
@@ -141,12 +142,21 @@ if (Meteor.isClient) {
     Template.lookup.helpers({
         searchResults : function(){
             var text = Session.get("search");
-            console.log("RAN lookup helper" + text );
             return text;
         },
+
     });
 
+    Template.registerHelper("objectToPairs",function(object){
+        return _.map(object, function(value, key) {
+            return {
+                key: key,
+                value: value
+            };
+        });
+    });
 
+    //TODO register helper for book type key to label values using book specific enum
 
     Template.body.helpers({
 
