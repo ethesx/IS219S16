@@ -3,19 +3,22 @@
     <div id="upload" class="container">
 
         <p class="page-heading lead">
-        <h1><b>C</b>omma <b>S</b>eparated <b>V</b>alue upload
+        <!--<h1><b>C</b>omma <b>S</b>eparated <b>V</b>alue upload-->
+            <h1>File upload
             <small>Resolve many titles at once.</small>
         </h1>
 
         </p>
         <div class="well">
-            <p>The CSV is a simple text file, using commas to separate values. A usable CSV file will have the format
+            <!--<p>The CSV is a simple text file, using commas to separate values. A usable CSV file will have the format-->
+            <p>The file is a simple text file, using tabs to separate values. A usable file will have the format
                 listed below. Please keep in mind
                 the values should be provided in the following order:</p>
-            <p>* Required</p>
+            <p>* Required (a tab should replace a blank required item)</p>
             <p>
             <ol>
                 <li>Title *</li>
+                <li>Subtitle *</li>
                 <li>ISBN *</li>
                 <li>Publisher</li>
                 <li>Author</li>
@@ -23,7 +26,8 @@
             </ol>
             </p>
             <p class="lead">Example:
-            <p><code>The Little Prince,978-0156012195,Mariner Books,Antoine de Saint-Exupéry,Richard Howard</code></p>
+            <p><code>Title[tab]Subtitle[tab]ISBN</code></p>
+            <!--<p><code>The Little Prince,978-0156012195,Mariner Books,Antoine de Saint-Exupéry,Richard Howard</code></p>-->
             </p>
         </div>
 
@@ -34,9 +38,12 @@
                 </span>
             </span>
             <input type="text" class="form-control" readonly id="uploadFileValue">
+            <span class="input-group-btn">
+                <button id="uploadButton" class="btn btn-default" type="submit">Upload</button>
+            </span>
         </div>
         <span class="help-block">
-            Select the location of the CSV file
+            Select the location of the file
         </span>
 
         <div id="uploadResultPanel" class="panel panel-default panel-default">
