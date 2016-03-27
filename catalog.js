@@ -1,4 +1,5 @@
 Catalog = new Mongo.Collection("catalog");
+File = new Mongo.Collection("file");
 
 if(Meteor.isServer){
 
@@ -147,6 +148,41 @@ if (Meteor.isClient) {
 
     });
 
+    Template.upload.events({
+        "click #uploadButton" : function(event, target){
+            event.preventDefault();
+
+            console.log("Fired upload submit");
+
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                //TODO reference constant for file value object
+                let file = target.find('#uploadFile').files[0];
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    File.insert({
+                        name: file.name,
+                        type: file.type,
+                        data: reader.result,
+                    });
+                }
+                reader.readAsText(file);
+            }
+            else //TODO define something better for client error
+                console.log("This browser is unable to handle the file upload");
+        },
+        "change #uploadFile" : function(event, target) {
+            console.debug(target);
+            console.debug("JQuery file input target" + $(target));
+            let input = target.$("#uploadFile"),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            //TODO reference constant for file value object
+            Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
+
+
+        }
+    });
+
     Template.registerHelper("objectToPairs",function(object){
         return _.map(object, function(value, key) {
             return {
@@ -157,7 +193,7 @@ if (Meteor.isClient) {
     });
 
     //TODO register helper for book type key to label values using book specific enum
-
+    //TODO register helper for determination of mature content based on ages listed
     Template.body.helpers({
 
     });
@@ -185,17 +221,7 @@ if (Meteor.isClient) {
             Utility.clearContent(target);
             Blaze.renderWithData(Template.results, {my: "data"}, target.$("#content").get(0))
         },
-        "change #uploadFile" : function(event, target) {
-            console.debug(target);
-            console.debug("JQuery file input target" + $(target));
-            let input = target.$("#uploadFile"),
-                numFiles = input.get(0).files ? input.get(0).files.length : 1,
-                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-            //TODO reference constant for file value object
-            Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
 
-
-        }
     });
 
     var Utility = {
