@@ -1,5 +1,7 @@
 Catalog = new Mongo.Collection("catalog");
 File = new Mongo.Collection("file");
+Tag = new Mongo.Collection("tag");
+Review = new Mongo.Collection("review");
 
 if(Meteor.isServer){
 
@@ -162,6 +164,7 @@ if (Meteor.isClient) {
                     File.insert({
                         name: file.name,
                         type: file.type,
+                        processed : false,
                         data: reader.result,
                     });
                 }
@@ -180,7 +183,36 @@ if (Meteor.isClient) {
             Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
 
 
-        }
+        },
+        "click #uploadProcess" : function(event, target){
+            var csvFile = File.findOne({processed : false});
+            Papa.parse(csvFile.data, {
+                worker: false,
+                comments: true,
+                step: function(results, parser){
+                    //parser.pause() call with timeout
+                    console.log("row data" + results.data);
+                    console.log("row errors" + results.errors);
+                    Tag.insert({
+                        title: results.data[0][0],
+                        subtitle: results.data[0][1],
+                        isbn: results.data[0][2],
+                        publisher: results.data[0][3],
+                        author: results.data[0][4],
+                        translator: results.data[0][5],
+                    });
+                },
+                complete: function(results, file){
+                    console.log("finished");
+                    console.log("results" + results);
+                },
+                error: function(error, file){
+                    console.log("There was an error: " + error);
+                },
+                skipEmptyLines: true,
+                delimiter: "\t",
+            });
+        },
     });
 
     Template.registerHelper("objectToPairs",function(object){
