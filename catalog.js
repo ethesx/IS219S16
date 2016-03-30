@@ -48,7 +48,59 @@ if(Meteor.isServer){
                 return foundBookReport;
             }
         },
+        'parseFile' : function(file){
+            let success = false;
+            let results = Papa.parse(file.data, {
+                worker: false,
+                comments: true,
+                complete: function(results, file){
+                    console.log("finished");
+                    console.log("results" + results);
+                },
+                error: function(error, file){
+                    console.log("There was an error: " + error);
+                },
+                skipEmptyLines: true,
+                delimiter: "\t",
+            });
+            results.data.forEach(loadparsedTitles);
+            Review.insert(results.errors);
+            File.update(file._id, {processed : true});
+            //TODO try catch needed
+            return success;
+        },
+        'resolveTitles' : function() {
+            run = Meteor.setInterval(function () {
+                var record = Tag.findOne().isbn;
+                if(record)
+                    Meteor.call("getData", record);
+                else
+                    Meteor.call('cancelResolveTitles');
+
+            }, 1000);
+        },
+        'cancelResolveTitles' : function(){
+            Meteor.clearInterval(run);
+        },
     })
+
+    function loadparsedTitles(result){
+
+        console.log("row data" + result);
+
+        let record = {
+            title: result[0],
+            subtitle: result[1],
+            isbn: result[2],
+            publisher: result[3],
+            author: result[4],
+            translator: result[5],
+        }
+        Tag.insert(record);
+    }
+    function resolveTitles(){
+
+    };
 
     //retrieve sources for iteration
     function getOrigin(){
@@ -169,6 +221,15 @@ if (Meteor.isClient) {
                     });
                 }
                 reader.readAsText(file);
+                let dbfile = File.findOne({processed : false});
+                Meteor.call("parseFile", dbfile, function(error, result){
+                    if(error) {
+                        console.log("parseFile error:" + error.reason);
+                    }
+                    console.log("parseFile callback success");
+                    Session.set("uploadStatus", result);
+                });
+                //TODO add some notification on page with status
             }
             else //TODO define something better for client error
                 console.log("This browser is unable to handle the file upload");
@@ -181,38 +242,23 @@ if (Meteor.isClient) {
                 label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
             //TODO reference constant for file value object
             Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
-
-
         },
-        "click #uploadProcess" : function(event, target){
-            var csvFile = File.findOne({processed : false});
-            Papa.parse(csvFile.data, {
-                worker: false,
-                comments: true,
-                step: function(results, parser){
-                    //parser.pause() call with timeout
-                    console.log("row data" + results.data);
-                    console.log("row errors" + results.errors);
-                    Tag.insert({
-                        title: results.data[0][0],
-                        subtitle: results.data[0][1],
-                        isbn: results.data[0][2],
-                        publisher: results.data[0][3],
-                        author: results.data[0][4],
-                        translator: results.data[0][5],
-                    });
-                },
-                complete: function(results, file){
-                    console.log("finished");
-                    console.log("results" + results);
-                },
-                error: function(error, file){
-                    console.log("There was an error: " + error);
-                },
-                skipEmptyLines: true,
-                delimiter: "\t",
-            });
+        "click #resolveTitles" : function(event, target){
+            Meteor.call("resolveTitles");
+            //TODO consider return
         },
+        "click #cancelResolveTitles" : function(event, target){
+            Meteor.call("cancelResolveTitles");
+            //TODO consider return
+        },
+    });
+
+    Template.upload.helpers({
+
+        upload : function(){
+            return Session.get("uploadStatus");
+        }
+
     });
 
     Template.registerHelper("objectToPairs",function(object){
