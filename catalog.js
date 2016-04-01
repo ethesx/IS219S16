@@ -1,7 +1,6 @@
 Catalog = new Mongo.Collection("catalog"); //All resolved titles
 File = new Mongo.Collection("file"); //Contains original uploaded files
 Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolution
-Review = new Mongo.Collection("review");//Contains csv parsing errors
 
 if(Meteor.isServer){
 
@@ -83,9 +82,8 @@ if(Meteor.isServer){
                 delimiter: "\t",
             });
             results.data.forEach(loadparsedTitles);
-            Review.insert(results.errors);
             //TODO try catch finally needed
-            File.update(file._id, {$set:{processed : true}});
+            File.update(file._id, {$set:{processed : true, parseErrors : results.errors, parseMeta : results.meta}});
             return success;
         },
         'resolveTitles' : function() {
