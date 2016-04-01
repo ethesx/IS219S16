@@ -1,7 +1,7 @@
-Catalog = new Mongo.Collection("catalog");
-File = new Mongo.Collection("file");
-Tag = new Mongo.Collection("tag");
-Review = new Mongo.Collection("review");
+Catalog = new Mongo.Collection("catalog"); //All resolved titles
+File = new Mongo.Collection("file"); //Contains original uploaded files
+Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolution
+Review = new Mongo.Collection("review");//Contains csv parsing errors
 
 if(Meteor.isServer){
 
@@ -48,12 +48,31 @@ if(Meteor.isServer){
                 return foundBookReport;
             }
         },
+
+        'saveUploadFile' : function(object){
+            return File.insert({
+                name: object.file.name,
+                type: object.file.type,
+                processed: false,
+                data: object.result,
+            });
+        },
+        'getUploadFile' : function(fileId){
+            return File.findOne(fileId);
+        },
+
         'parseFile' : function(file){
+            let secondIteration = false; //Papaparse workaround https://github.com/mholt/PapaParse/issues/231
             let success = false;
             let results = Papa.parse(file.data, {
                 worker: false,
                 comments: true,
                 complete: function(results, file){
+                    if(secondIteration)
+                        return;
+                    else
+                        secondIteration = true;
+
                     console.log("finished");
                     console.log("results" + results);
                 },
@@ -65,8 +84,8 @@ if(Meteor.isServer){
             });
             results.data.forEach(loadparsedTitles);
             Review.insert(results.errors);
-            File.update(file._id, {processed : true});
-            //TODO try catch needed
+            //TODO try catch finally needed
+            File.update(file._id, {$set:{processed : true}});
             return success;
         },
         'resolveTitles' : function() {
@@ -207,32 +226,46 @@ if (Meteor.isClient) {
             event.preventDefault();
 
             console.log("Fired upload submit");
+            let file = target.find('#uploadFile').files[0];
 
-            if (window.File && window.FileReader && window.FileList && window.Blob) {
+            if (file && window.File && window.FileReader && window.FileList && window.Blob) {
                 //TODO reference constant for file value object
-                let file = target.find('#uploadFile').files[0];
+
                 let reader = new FileReader();
-                reader.onload = function(e) {
-                    File.insert({
-                        name: file.name,
-                        type: file.type,
-                        processed : false,
-                        data: reader.result,
-                    });
-                }
-                reader.readAsText(file);
-                let dbfile = File.findOne({processed : false});
-                Meteor.call("parseFile", dbfile, function(error, result){
-                    if(error) {
-                        console.log("parseFile error:" + error.reason);
+                let dbFile;
+                reader.onload = function(){Meteor.call("saveUploadFile",
+                    {file : file, result : reader.result},
+                    function(error, dbFileId){
+                        if(error)
+                            console.log("saveUploadFile error:" + error.reason);
+                        else {
+                            console.log("saveUploadFile callback success");
+
+                            Meteor.call("getUploadFile", dbFileId, function(error, dbFile){
+                                if(error)
+                                    console.log("getUploadFile error:" + error.reason);
+                                else {
+                                    console.log("getUploadFile callback success");
+
+                                    Meteor.call("parseFile", dbFile, function(error, result){
+                                        if(error) {
+                                            console.log("parseFile error:" + error.reason);
+                                        }
+                                        console.log("parseFile callback success");
+                                        Session.set("uploadStatus", result);
+                                    });
+                                }
+                            });
+                        }
                     }
-                    console.log("parseFile callback success");
-                    Session.set("uploadStatus", result);
-                });
-                //TODO add some notification on page with status
+                )};
+                reader.readAsText(file);
             }
-            else //TODO define something better for client error
+            else { //TODO define something better for client error
                 console.log("This browser is unable to handle the file upload");
+                Session.set("uploadStatus", "FAILED");
+            }
+                //TODO add some notification on page with status
         },
         "change #uploadFile" : function(event, target) {
             console.debug(target);
@@ -255,7 +288,7 @@ if (Meteor.isClient) {
 
     Template.upload.helpers({
 
-        upload : function(){
+        uploadStatus : function(){
             return Session.get("uploadStatus");
         }
 

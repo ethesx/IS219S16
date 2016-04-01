@@ -49,9 +49,8 @@
         <button type="button" id="resolveTitles">Begin processing titles</button>
         <button type="button" id="cancelResolveTitles">Stop processing titles</button>
 
-        {{#if data.errors}}
-            {{>uploadStatus}}
-        {{/if}}
+        {{uploadStatus}}
+
         <div id="uploadResultPanel" class="panel panel-default panel-default">
             <div class="panel-heading lead">Results</div>
             <div class="panel-body">
@@ -237,8 +236,4 @@
         </div>
 
     </div>
-</template>
-
-<template name="uploadStatus">
-    {{data.errors}}
 </template>
