@@ -231,8 +231,7 @@ if (Meteor.isClient) {
 
     Template.lookup.helpers({
         searchResults : function(){
-            var text = Session.get("search");
-            return text;
+            return Session.get("search");
         },
 
     });
