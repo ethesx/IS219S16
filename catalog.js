@@ -369,4 +369,3 @@ if (Meteor.isClient) {
     };
 
 }
-

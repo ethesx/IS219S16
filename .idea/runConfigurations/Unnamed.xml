@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Unnamed" type="meteor-app-runner" factoryName="Meteor">
+    <option name="exePath" value="$USER_HOME$/AppData/Local/.meteor/meteor.bat" />
+    <option name="startBrowserSettings">
+      <browser start="true" with-js-debugger="true" url="http://localhost:3000" />
+    </option>
+    <meteor-runner-state>
+      <startBrowserSettings>
+        <browser start="true" with-js-debugger="true" url="http://localhost:3000" />
+      </startBrowserSettings>
+    </meteor-runner-state>
+    <method />
+  </configuration>
+</component>
