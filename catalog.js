@@ -3,7 +3,7 @@ File = new Mongo.Collection("file"); //Contains original uploaded files
 Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolution
 
 if(Meteor.isServer){
-
+var run;
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
@@ -87,21 +87,42 @@ if(Meteor.isServer){
             return success;
         },
         'resolveTitles' : function() {
-            run = Meteor.setInterval(function () {
-                var record = Tag.findOne().isbn;
-                if(record)
-                    Meteor.call("getData", record);
-                else
-                    Meteor.call('cancelResolveTitles');
 
-            }, 1000);
+            var delay = Math.round(Math.random() * 30000); // from 1-30sec random intervals
+            console.log("Will try resolving a title in " + delay/1000 + " seconds");
+            run = Meteor.setTimeout(function () {
+
+                //TODO work on returning title if no isbn once title resolution is in place
+                //TODO setup way to rerun titles with errors
+                var record = Tag.findOne({processed : false});
+                if(record) {
+                    console.log("Resolving a title");
+                    //TODO create service for getData call - this is our second reference
+                    Meteor.call("getData", record.isbn, function (error, result) {
+                        if (error) {
+                            console.log("getDataError" + error.reason);
+                            Tag.update(record._id, {$set : {processed : true, error : error}});
+                            Meteor.clearTimeout(this);
+                        }
+                        else {
+                            console.log("getData successful callback");
+                            Tag.update(record._id, {$set : {processed : true}});
+                            Meteor.call("resolveTitles");
+                        }
+                    });
+                }
+                else {
+                    Meteor.clearTimeout(this);
+                    console.log("No titles left to resolve - work complete");
+                }
+            }, delay);
         },
         'cancelResolveTitles' : function(){
-            Meteor.clearInterval(run);
+            Meteor.clearTimeout(run);
         },
     })
 
-    function loadparsedTitles(result){
+    function loadparsedTitles(result) {
 
         console.log("row data" + result);
 
@@ -112,13 +133,10 @@ if(Meteor.isServer){
             publisher: result[3],
             author: result[4],
             translator: result[5],
+            processed : false,
         }
         Tag.insert(record);
     }
-    function resolveTitles(){
-
-    };
-
     //retrieve sources for iteration
     function getOrigin(){
         return Constants.origin;
@@ -275,7 +293,13 @@ if (Meteor.isClient) {
             Utility.populateFileUploadValue(target.$("#uploadFileValue"), {numFiles: numFiles, label : label});
         },
         "click #resolveTitles" : function(event, target){
-            Meteor.call("resolveTitles");
+
+            Meteor.call("resolveTitles", function(error, result){
+                if(error)
+                    console.log("Error calling resolveTitles" + error.reason);
+                else
+                    console.log("Resolvetitles successful callback");
+            });
             //TODO consider return
         },
         "click #cancelResolveTitles" : function(event, target){
