@@ -81,7 +81,7 @@ var run;
                 skipEmptyLines: true,
                 delimiter: "\t",
             });
-            results.data.forEach(loadparsedTitles);
+            results.data.forEach(loadparsedTitles, file._id);
             //TODO try catch finally needed
             File.update(file._id, {$set:{processed : true, parseErrors : results.errors, parseMeta : results.meta}});
             return success;
@@ -89,6 +89,8 @@ var run;
         'resolveTitles' : function() {
 
             var delay = Math.round(Math.random() * 30000); // from 1-30sec random intervals
+            //FIXME FOR TESTING
+            //var delay = 1000;
             console.log("Will try resolving a title in " + delay/1000 + " seconds");
             run = Meteor.setTimeout(function () {
 
@@ -101,12 +103,13 @@ var run;
                     Meteor.call("getData", record.isbn, function (error, result) {
                         if (error) {
                             console.log("getDataError" + error.reason);
+                            //TODO temporary - pull aggregate or highest age
                             Tag.update(record._id, {$set : {processed : true, error : error}});
                             Meteor.clearTimeout(this);
                         }
                         else {
                             console.log("getData successful callback");
-                            Tag.update(record._id, {$set : {processed : true}});
+                            Tag.update(record._id, {$set : {processed : true, age : result.books[0].age}});
                             Meteor.call("resolveTitles");
                         }
                     });
@@ -119,6 +122,9 @@ var run;
         },
         'cancelResolveTitles' : function(){
             Meteor.clearTimeout(run);
+        },
+        'latestFileId' : function(){
+            return File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
         },
     })
 
@@ -134,6 +140,7 @@ var run;
             author: result[4],
             translator: result[5],
             processed : false,
+            fileId : this.toString(),
         }
         Tag.insert(record);
     }
@@ -261,7 +268,7 @@ if (Meteor.isClient) {
                                     console.log("getUploadFile error:" + error.reason);
                                 else {
                                     console.log("getUploadFile callback success");
-
+                                    Session.set("latestTagFileId", dbFileId);
                                     Meteor.call("parseFile", dbFile, function(error, result){
                                         if(error) {
                                             console.log("parseFile error:" + error.reason);
@@ -311,7 +318,29 @@ if (Meteor.isClient) {
 
         uploadStatus : function(){
             return Session.get("uploadStatus");
-        }
+        },
+        taggedList : function(){
+            var latestFileId = Session.get("latestTagFileId");
+            return Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : false}}]}).fetch();
+        },
+        results : function(){
+            //var latestFileId = File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
+
+            var latestFileId = Session.get("latestTagFileId");
+            //TODO Mapreduce me
+            var results = {
+                total : Tag.find({fileId : latestFileId}).count(),
+                tagged : Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : false}}]}).count(),
+                review : Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : true}}]}).count(),
+            };
+
+              return results;
+        },
+        reviewList : function(){
+            var latestFileId = Session.get("latestTagFileId");
+            return Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : true}}]}).fetch();
+        },
+
 
     });
 

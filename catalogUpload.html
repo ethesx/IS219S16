@@ -46,146 +46,37 @@
             Select the location of the file
         </span>
 
-        <button type="button" id="resolveTitles">Begin processing titles</button>
-        <button type="button" id="cancelResolveTitles">Stop processing titles</button>
+        <button type="button" class="btn btn-default" id="resolveTitles">Begin/Stop processing titles</button>
+        <!--<button type="button" id="cancelResolveTitles">Stop processing titles</button>-->
 
         {{uploadStatus}}
 
+{{#if results.total}}
         <div id="uploadResultPanel" class="panel panel-default panel-default">
             <div class="panel-heading lead">Results</div>
             <div class="panel-body">
-                <!--<div class="row">
-                    <div class="col-xs-6">Total items</div>
-                    <div class="col-xs-6">9746</div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-6 col-xs-offset-0">Tagged items</div>
-                    <div class="col-xs-6 col-xs-offset-0">6938</div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-6 col-xs-offset-0">Review items</div>
-                    <div class="col-xs-6 col-xs-offset-0">2808</div>
-                </div>-->
-
-
                 <table class="table uploadItemTable">
                     <thead class="h4">
                     <tr>
                         <th>Total items</th>
-                        <th>9746</th>
+                        <th>{{results.total}}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         <td style="text-indent: 2%"><a href="#tagged">Tagged items</a></td>
-                        <td>6938</td>
+                        <td>{{results.tagged}}</td>
                     </tr>
                     <tr>
                         <td style="text-indent: 2%"><a href="#review">Review items</a></td>
-                        <td>2808</td>
+                        <td>{{results.review}}</td>
                     </tr>
                     </tbody>
                 </table>
 
-                <!--<div class="panel panel-default panel-collapse">
-                    <div class="panel-heading">Tagged items</div>
-                    <div class="panel-body">
-                        Some information
-                    </div>
-                </div>-->
+                {{#if taggedList.length}}
                 <div class="panel panel-success" id="tagged">
                     <div class="panel-heading lead">Tagged items</div>
-                    <div class="panel-body table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="">
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Age</th>
-                            <th>ISBN</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>The Little Prince</td>
-                            <td></td>
-                            <td>10+</td>
-                            <td>978-1514861264</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Stars Above</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Martin Luther King - A Biography</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-123457789</td>
-                        </tr>
-                        <tr>
-                            <td>Finding Nemo</td>
-                            <td></td>
-                            <td>7+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        <tr>
-                            <td>The Little Prince</td>
-                            <td></td>
-                            <td>10+</td>
-                            <td>978-1514861264</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Stars Above</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Martin Luther King - A Biography</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-123457789</td>
-                        </tr>
-                        <tr>
-                            <td>Finding Nemo</td>
-                            <td></td>
-                            <td>7+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        <tr>
-                            <td>The Little Prince</td>
-                            <td></td>
-                            <td>10+</td>
-                            <td>978-1514861264</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Stars Above</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        <tr class="danger">
-                            <td>Martin Luther King - A Biography</td>
-                            <td></td>
-                            <td>14+</td>
-                            <td>978-123457789</td>
-                        </tr>
-                        <tr>
-                            <td>Finding Nemo</td>
-                            <td></td>
-                            <td>7+</td>
-                            <td>978-0987654321</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                        </div>
-
-                </div>
-
-                <div class="panel panel-warning" id="review">
-                    <div class="panel-heading lead">Review items</div>
                     <div class="panel-body table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead class="">
@@ -197,43 +88,52 @@
                             </tr>
                             </thead>
                             <tbody>
+
+
+                            {{#each taggedList}}
+                                <tr>
+                                    <td>{{title}}</td>
+                                    <td>{{author}}</td>
+                                    <td>{{age}}</td>
+                                    <td>{{isbn}}</td>
+                                </tr>
+                            {{/each}}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{/if}}
+                {{#if reviewList.length}}
+                <div class="panel panel-warning" id="review">
+                    <div class="panel-heading lead">Review items</div>
+                    <div class="panel-body table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="">
                             <tr>
-                                <td>Dune</td>
-                                <td></td>
-                                <td></td>
-                                <td>978-1514861264</td>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>ISBN</th>
+                                <th>Error</th>
                             </tr>
+                            </thead>
+                            <tbody>
+                            {{#each reviewList}}
                             <tr>
-                                <td>Maze Runner</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{title}}</td>
+                                <td>{{author}}</td>
+                                <td>{{isbn}}</td>
+                                <td>{{errors}}</td>
                             </tr>
-                            <tr>
-                                <td>Monster stories</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sure thing</td>
-                                <td></td>
-                                <td></td>
-                                <td>978-0987654321</td>
-                            </tr>
-                            <tr>
-                                <td>Torrent home</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            {{/each}}
                             </tbody>
                         </table>
                     </div>
 
                 </div>
+                {{/if}}
             </div>
         </div>
-
+    {{/if}}
     </div>
 </template>
