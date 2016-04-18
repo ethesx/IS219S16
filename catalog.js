@@ -344,6 +344,13 @@ if (Meteor.isClient) {
 
     });
 
+    Template.results.helpers({
+        catalog : function(){
+            var results = Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
+            return results;
+        },
+    });
+
     Template.registerHelper("objectToPairs",function(object){
         return _.map(object, function(value, key) {
             return {
