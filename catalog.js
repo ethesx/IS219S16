@@ -345,10 +345,21 @@ if (Meteor.isClient) {
     });
 
     Template.results.helpers({
-        catalog : function(){
+        unmarkedTotal : function(){
             var results = Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
-            return results;
+            return results.length;
         },
+    });
+
+    Template.results.onRendered(function(){
+        var results = Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
+
+        results.forEach(function(bookReport, i){
+            bookReport.author = bookReport.books[0].author;
+            bookReport.age = bookReport.books[0].age;
+            bookReport.books = null;
+        });
+        this.$('#bootstrap-table').bootstrapTable({data : results});
     });
 
     Template.registerHelper("objectToPairs",function(object){

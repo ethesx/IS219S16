@@ -1,209 +1,41 @@
 <template name="results">
 
-    <div id="results" class="container">
+    <div id="results" >
 
         <p class="page-heading lead">
         <h1>
 
             Titles For Marking
 
-        <small id="processNumBadge" class="badge">20</small>
+        <small id="processNumBadge" class="badge">{{unmarkedTotal}}</small>
         </h1>
 
         </p>
 
-        <!--<div class="panel panel-default" id="process">
-            <div class="panel-heading lead">
-
-            </div>-->
         <button id="markedButton" class="btn btn-success" type="button" onlick="">Set item(s) marked</button>
         <button id="undoButton" class="btn btn-default" type="button" onlick="">Undo</button>
 
         <div id="resultBodyDiv" class="table-responsive" >
-            <table data-toggle="table" class="table table-bordered table-striped table-hover"  >
+            <table id="bootstrap-table" class="table table-bordered table-striped table-hover"
+                   data-click-to-select="true"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-toggle="true"
+                   data-show-columns="true"
+                   data-pagination="true"
+                   data-side-pagination="client"
+                   data-page-list="[5, 10, 20, 50, 100, 200]">
                 <thead>
                 <tr>
-                    <th data-field="name">Marked</th>
-                    <th data-field="title">Title</th>
-                    <th class="hidden-xs" data-field="author">Author</th>
-                    <th data-field="age">Age</th>
-                    <th class="hidden-xs" data-field="isbn">ISBN</th>
+                    <th data-field="marked" data-checkbox="true">Marked</th>
+                    <th data-field="title" data-sortable="true">Title</th>
+                    <th class="hidden-xs" data-field="author"  data-sortable="true">Author</th>
+                    <th data-field="age" data-sortable="true">Age</th>
+                    <th class="hidden-xs" data-field="isbn"  data-sortable="true">ISBN</th>
                 </tr>
                 </thead>
-                <tbody>
-                    {{#each catalog}}
-                    <tr >
-                        <td><input type="checkbox" checked="{{marked}}" /></td>
-                        <td>{{title}}</td>
-                        <td>{{books.[0].author}}</td>
-                        <td>{{books.[0].age}}</td>
-                        <td>{{isbn}}</td>
-                    </tr>
-                    {{/each}}
-                </tbody>
             </table>
         </div>
-
-            <!--<div id="resultBodyDiv" class="table-responsive" >
-                <table id="processTable" class="table table-bordered table-striped table-hover tablesorter">
-                    <thead class="">
-                    <tr>
-                        <th>Marked</th>
-                        <th>Title</th>
-                        <th class="hidden-xs">Author</th>
-                        <th>Age</th>
-                        <th class="hidden-xs">ISBN</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>The Little Prince</td>
-                        <td class="hidden-xs"></td>
-                        <td>10+</td>
-                        <td class="hidden-xs">978-1514861264</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Stars Above</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Martin Luther King - A Biography</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-123457789</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>Finding Nemo</td>
-                        <td class="hidden-xs"></td>
-                        <td>7+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>The Little Prince</td>
-                        <td class="hidden-xs"></td>
-                        <td>10+</td>
-                        <td class="hidden-xs">978-1514861264</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Stars Above</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Martin Luther King - A Biography</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-123457789</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>Finding Nemo</td>
-                        <td class="hidden-xs"></td>
-                        <td>7+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>The Little Prince</td>
-                        <td class="hidden-xs"></td>
-                        <td>10+</td>
-                        <td class="hidden-xs">978-1514861264</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Stars Above</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Martin Luther King - A Biography</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-123457789</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>Finding Nemo</td>
-                        <td class="hidden-xs"></td>
-                        <td>7+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>The Little Prince</td>
-                        <td class="hidden-xs"></td>
-                        <td>10+</td>
-                        <td class="hidden-xs">978-1514861264</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Stars Above</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Martin Luther King - A Biography</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-123457789</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>Finding Nemo</td>
-                        <td class="hidden-xs"></td>
-                        <td>7+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>The Little Prince</td>
-                        <td class="hidden-xs"></td>
-                        <td>10+</td>
-                        <td class="hidden-xs">978-1514861264</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Stars Above</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    <tr class="danger">
-                        <td><input type="checkbox" /></td>
-                        <td>Martin Luther King - A Biography</td>
-                        <td class="hidden-xs"></td>
-                        <td>14+</td>
-                        <td class="hidden-xs">978-123457789</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>Finding Nemo</td>
-                        <td class="hidden-xs"></td>
-                        <td>7+</td>
-                        <td class="hidden-xs">978-0987654321</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>-->
-
-      <!--  </div>-->
-
-
     </div>
 
 

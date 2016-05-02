@@ -75,22 +75,22 @@ body {
     }
 }
 @media (max-width: 768px) {
-    #resultBodyDiv{
+   /* #resultBodyDiv{
         max-height: 28em;
         overflow:auto;
-    }
+    }*/
 
 }
 
 @media (min-width: 992px) {
-    #resultBodyDiv{
+   /* #resultBodyDiv{
         max-height: 50em;
         overflow:auto;
-    }
+    }*/
 
 }
 
-#results button{
+#markedButton, #undoButton{
     margin:2em 2em 1em 0;
 }
 
