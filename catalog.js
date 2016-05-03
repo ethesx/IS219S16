@@ -126,7 +126,10 @@ var run;
         'latestFileId' : function(){
             return File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
         },
-    })
+        'markTitle' : function(selectedItem){
+            return Catalog.update(selectedItem._id, {$set : {marked : true,markedDate : Date.now()}});
+        }
+    });
 
     function loadparsedTitles(result) {
 
@@ -141,7 +144,7 @@ var run;
             translator: result[5],
             processed : false,
             fileId : this.toString(),
-        }
+        };
         Tag.insert(record);
     }
     //retrieve sources for iteration
@@ -360,6 +363,26 @@ if (Meteor.isClient) {
             bookReport.books = null;
         });
         this.$('#bootstrap-table').bootstrapTable({data : results});
+    });
+
+    Template.results.events({
+
+        'click #markedButton' : function(event, target){
+            var selected = target.$('#bootstrap-table').bootstrapTable('getSelections');
+            selected.forEach(function(selectedItem){
+                Meteor.call('markTitle', selectedItem, function(error, result){
+                    if(error)
+                        console.log("markTitle error:" + error.reason);
+                    else {
+                        console.log("markTitle callback success");
+                        if(result == 1){
+                            target.$('#bootstrap-table').bootstrapTable('removeByUniqueId', selectedItem._id);
+                        }
+                    }
+                });
+            });
+
+        },
     });
 
     Template.registerHelper("objectToPairs",function(object){
