@@ -128,7 +128,26 @@ var run;
         },
         'markTitle' : function(selectedItem){
             return Catalog.update(selectedItem._id, {$set : {marked : true,markedDate : Date.now()}});
-        }
+        },
+        'undoMarkTitle' : function(){
+            var lastMarked = Catalog.find({marked : true},{sort : {markedDate : 1}, limit : 1}).fetch()[0];
+            return Catalog.update(lastMarked._id, {$set : {marked : false, markedDate : null}});
+        },
+        'getCatalogUnmarked' : function(){
+            return Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
+        },
+        'getCatalogUnmarkedBookReport' : function(){
+            var result = Meteor.call('getCatalogUnmarked');
+            if(result) {
+                result.forEach(function (bookReport, i) {
+                    bookReport.author = bookReport.books[0].author;
+                    bookReport.age = bookReport.books[0].age;
+                    bookReport.books = null;
+                });
+            }
+            return result;
+        },
+
     });
 
     function loadparsedTitles(result) {
@@ -349,39 +368,50 @@ if (Meteor.isClient) {
 
     Template.results.helpers({
         unmarkedTotal : function(){
-            var results = Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
-            return results.length;
+
+            return Session.get('getCatalogUnmarkedTotal');
         },
     });
 
     Template.results.onRendered(function(){
-        var results = Catalog.find({$or : [{marked : false},{marked : null}]}).fetch();
 
-        results.forEach(function(bookReport, i){
-            bookReport.author = bookReport.books[0].author;
-            bookReport.age = bookReport.books[0].age;
-            bookReport.books = null;
-        });
-        this.$('#bootstrap-table').bootstrapTable({data : results});
+        Utility.getCatalogData(this);
     });
 
     Template.results.events({
 
         'click #markedButton' : function(event, target){
-            var selected = target.$('#bootstrap-table').bootstrapTable('getSelections');
+            var bst = target.$('#bootstrap-table');
+            var selected = bst.bootstrapTable('getSelections');
             selected.forEach(function(selectedItem){
                 Meteor.call('markTitle', selectedItem, function(error, result){
                     if(error)
                         console.log("markTitle error:" + error.reason);
                     else {
                         console.log("markTitle callback success");
-                        if(result == 1){
-                            target.$('#bootstrap-table').bootstrapTable('removeByUniqueId', selectedItem._id);
+                        if(result === 1){
+                            bst.bootstrapTable('removeByUniqueId', selectedItem._id);
+                            Utility.setUpdatedCatalogTotal(-1);
                         }
                     }
                 });
             });
-
+        },
+        'click #undoButton' : function(event, target){
+            Meteor.call('undoMarkTitle', function(error, result){
+                if(error)
+                    console.log("undoMarkTitle error:" + error.reason);
+                else {
+                    console.log("undoMarkTitle callback success");
+                    if(result === 1){
+                        Utility.refreshCatalogData(target);
+                    }
+                }
+            });
+        },
+        'click button[name=refresh]' : function(event, target){ //hacked event refresh.bs.table not captured
+            console.log('refreshing data');
+            Utility.refreshCatalogData(target);
         },
     });
 
@@ -435,6 +465,31 @@ if (Meteor.isClient) {
             console.debug("Populating file upload: numFiles = " + dataObj.numFiles + " label = " + dataObj.label);
             console.debug(obj);
             obj.get(0).value = dataObj.label;
+        },
+        setUpdatedCatalogTotal(val){
+            Session.set('getCatalogUnmarkedTotal', Session.get('getCatalogUnmarkedTotal') + val);
+        },
+        getCatalogData(target){
+            Meteor.call('getCatalogUnmarkedBookReport', function(error, result){
+                if(error)
+                    console.log("getCatalogUnmarkedBookReport error:" + error.reason);
+                else {
+                    console.log("getCatalogUnmarkedBookReport callback success");
+                    Session.set('getCatalogUnmarkedTotal', result.length);
+                    target.$('#bootstrap-table').bootstrapTable({data : result});
+                }
+            });
+        },
+        refreshCatalogData(target){
+            Meteor.call('getCatalogUnmarkedBookReport', function(error, result){
+                if(error)
+                    console.log("getCatalogUnmarkedBookReport error:" + error.reason);
+                else {
+                    console.log("getCatalogUnmarkedBookReport callback success");
+                    Session.set('getCatalogUnmarkedTotal', result.length);
+                    target.$('#bootstrap-table').bootstrapTable('load', result);
+                }
+            });
         },
     };
 
