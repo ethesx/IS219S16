@@ -7,7 +7,7 @@ var run;
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
-            let data = ConstantsTest.websiteData;
+            //let data = ConstantsTest.websiteData;
 
             if(searchFor) {
                 //TODO add ISBN vs title identifcation
@@ -27,10 +27,10 @@ var run;
                         let url = item.url;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
-                        //var data = Scrape.url(url);
+                        var data = Scrape.url(url);
                         book = getParsedBookData(data, item.type);
 
-                        if(book.title != undefined || book.isbn != undefined)
+                        if((book.title !== "" && book.title) || (book.isbn !== "" && book.isbn))
                             bookReport.books.push(book);
                     }
                     if(bookReport.books[0]) {
@@ -86,42 +86,15 @@ var run;
             File.update(file._id, {$set:{processed : true, parseErrors : results.errors, parseMeta : results.meta}});
             return success;
         },
-        'resolveTitles' : function() {
 
-            var delay = Math.round(Math.random() * 30000); // from 1-30sec random intervals
-            //FIXME FOR TESTING
-            //var delay = 1000;
-            console.log("Will try resolving a title in " + delay/1000 + " seconds");
-            run = Meteor.setTimeout(function () {
-
-                //TODO work on returning title if no isbn once title resolution is in place
-                //TODO setup way to rerun titles with errors
-                var record = Tag.findOne({processed : false});
-                if(record) {
-                    console.log("Resolving a title");
-                    //TODO create service for getData call - this is our second reference
-                    Meteor.call("getData", record.isbn, function (error, result) {
-                        if (error) {
-                            console.log("getDataError" + error.reason);
-                            //TODO temporary - pull aggregate or highest age
-                            Tag.update(record._id, {$set : {processed : true, error : error}});
-                            Meteor.clearTimeout(this);
-                        }
-                        else {
-                            console.log("getData successful callback");
-                            Tag.update(record._id, {$set : {processed : true, age : result.books[0].age}});
-                            Meteor.call("resolveTitles");
-                        }
-                    });
-                }
-                else {
-                    Meteor.clearTimeout(this);
-                    console.log("No titles left to resolve - work complete");
-                }
-            }, delay);
-        },
-        'cancelResolveTitles' : function(){
-            Meteor.clearTimeout(run);
+        'toggleResolveTitles' : function(start){
+            if(!start || (run && run.ontimeout === undefined)) {
+                Meteor.clearTimeout(run);
+                return false;
+            }
+            else if(start || (!run || run.ontimeout === null)) {
+                return resolveTitles();
+            }
         },
         'latestFileId' : function(){
             return File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
@@ -150,6 +123,48 @@ var run;
 
     });
 
+    function resolveTitles(){
+
+        var delay = Math.round(Math.random() * 10000); // from 1-10sec random intervals
+        //FIXME FOR TESTING
+        //var delay = 1000;
+        console.log("Will try resolving a title in " + delay/1000 + " seconds");
+        run = Meteor.setTimeout(function () {
+
+            //TODO work on returning title if no isbn once title resolution is in place
+            //TODO setup way to rerun titles with errors
+            var record = Tag.findOne({$and : [{processed : false, error : {$exists : false}}]});
+
+
+            if(record) {
+                console.log("Resolving a title");
+                //TODO create service for getData call - this is our second reference
+                Meteor.call("getData", record.isbn, function (error, result) {
+                    if (error) {
+                        console.log("getDataError" + error.reason);
+                        //TODO temporary - pull aggregate or highest age
+                        Tag.update(record._id, {$set : {processed : true, error : error}});
+                        Meteor.clearTimeout(this);
+                        return true;
+                    }
+                    else {
+                        console.log("getData successful callback");
+                        if(result)
+                            Tag.update(record._id, {$set : {processed : true, age : result.books[0].age}});
+                        else
+                            Tag.update(record._id, {$set : {processed : true, error : "No results"}});
+                        resolveTitles();
+                    }
+                });
+            }
+            else {
+                Meteor.clearTimeout(this);
+                console.log("No titles left to resolve - work complete");
+                return true;
+            }
+        }, delay);
+    };
+
     function loadparsedTitles(result) {
 
         console.log("row data" + result);
@@ -164,7 +179,18 @@ var run;
             processed : false,
             fileId : this.toString(),
         };
-        Tag.insert(record);
+        //TODO update after implementing ability to process titles
+        if(!record.isbn || record.isbn === null || record.isbn == "")
+            record.error = "ISBN missing,";
+        if(!record.title || record.title === null || record.title == "")
+            record.error += "Title missing,";
+
+        var exists = false;
+        //We are not processing duplicates
+        if(!record.error)
+            exists = Tag.findOne({$or : [{isbn : record.isbn}, {title : record.title}]});
+        if(!exists)
+            Tag.insert(record);
     }
     //retrieve sources for iteration
     function getOrigin(){
@@ -322,17 +348,27 @@ if (Meteor.isClient) {
         },
         "click #resolveTitles" : function(event, target){
 
-            Meteor.call("resolveTitles", function(error, result){
+            Meteor.call("toggleResolveTitles", true, function(error, result){
                 if(error)
-                    console.log("Error calling resolveTitles" + error.reason);
-                else
-                    console.log("Resolvetitles successful callback");
+                    console.log("Error calling toggleResolveTitles" + error.reason);
+                else {
+                    console.log("toggleResolveTitles successful callback");
+                    //Session.set("processingTitles", result);
+                }
             });
-            //TODO consider return
+            //Session.set("processingTitles", true);
+
         },
         "click #cancelResolveTitles" : function(event, target){
-            Meteor.call("cancelResolveTitles");
-            //TODO consider return
+            console.log("cancelResolveTitles");
+
+            Meteor.call("toggleResolveTitles", false, function(error, result){
+                if(error)
+                    console.log("Error calling toggleResolveTitles" + error.reason);
+                else {
+                    console.log("toggleResolveTitles successful callback");
+                }
+            });
         },
     });
 
@@ -343,7 +379,7 @@ if (Meteor.isClient) {
         },
         taggedList : function(){
             var latestFileId = Session.get("latestTagFileId");
-            return Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : false}}]}).fetch();
+            return Tag.find({$and : [{fileId : latestFileId, processed : true, error : {$exists : false}}]}).fetch();
         },
         results : function(){
             //var latestFileId = File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
@@ -352,15 +388,22 @@ if (Meteor.isClient) {
             //TODO Mapreduce me
             var results = {
                 total : Tag.find({fileId : latestFileId}).count(),
-                tagged : Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : false}}]}).count(),
-                review : Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : true}}]}).count(),
+                tagged : Tag.find({$and : [{fileId : latestFileId, processed : true, error : {$exists : false}}]}).count(),
+                review : Tag.find({$and : [{fileId : latestFileId, error : {$exists : true}}]}).count(),
             };
 
               return results;
         },
         reviewList : function(){
             var latestFileId = Session.get("latestTagFileId");
-            return Tag.find({$and : [{fileId : latestFileId, processed : true, errors : {$exists : true}}]}).fetch();
+            return Tag.find({$and : [{fileId : latestFileId, error : {$exists : true}}]}).fetch();
+        },
+        isProcessing : function(){
+            var isProcessing = Session.get("processingTitles");
+            if(isProcessing)
+                return "Stop";
+            else
+                return "Start";
         },
 
 

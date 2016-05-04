@@ -46,8 +46,9 @@
             Select the location of the file
         </span>
 
-        <button type="button" class="btn btn-default" id="resolveTitles">Begin/Stop processing titles</button>
-        <!--<button type="button" id="cancelResolveTitles">Stop processing titles</button>-->
+        <!--<button type="button" class="btn btn-default" id="resolveTitles">{{isProcessing}} processing titles</button>-->
+        <button type="button" class="btn btn-default" id="resolveTitles">Start processing titles</button>
+        <button type="button" class="btn btn-default" id="cancelResolveTitles">Stop processing titles</button>
 
         {{uploadStatus}}
 
@@ -123,7 +124,7 @@
                                 <td>{{title}}</td>
                                 <td>{{author}}</td>
                                 <td>{{isbn}}</td>
-                                <td>{{errors}}</td>
+                                <td>{{error}}</td>
                             </tr>
                             {{/each}}
                             </tbody>
