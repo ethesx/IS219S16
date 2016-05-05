@@ -467,20 +467,7 @@ if (Meteor.isClient) {
         });
     });
 
-    Template.registerHelper("isMature", function(object){
-        if(object) {
-            var isMature = false;
-            var ages = object.split("-");
-            ages.forEach(function (item) {
-                item.trim();
-            });
-
-            if (ages[0] >= 14)
-                isMature = true;
-
-            return isMature;
-        }
-    });
+    Template.registerHelper("isMature", function(object){return Utility.isMature(object);});
 
     //TODO register helper for book type key to label values using book specific enum
     //TODO register helper for determination of mature content based on ages listed
@@ -534,7 +521,7 @@ if (Meteor.isClient) {
                 else {
                     console.log("getCatalogUnmarkedBookReport callback success");
                     Session.set('getCatalogUnmarkedTotal', result.length);
-                    target.$('#bootstrap-table').bootstrapTable({data : result});
+                    target.$('#bootstrap-table').bootstrapTable({data : result, rowStyle : Utility.isMatureClass});
                 }
             });
         },
@@ -549,7 +536,31 @@ if (Meteor.isClient) {
                 }
             });
         },
+        isMature(object){
+            if(object) {
+                var isMature = false;
+                var ages = object.split("-");
+                ages.forEach(function (item) {
+                    item.trim();
+                });
+
+                if (ages[0] >= 14)
+                    isMature = true;
+
+                return isMature;
+            }
+        },
+        isMatureClass(row, index){
+            console.log("isMatureClass : " + row.age);
+
+            if(Utility.isMature(row.age))
+                return {"classes" : "danger"};
+            else
+                return {"classes" : ""};
+        },
 
     };
+
+
 
 }
