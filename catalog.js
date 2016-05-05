@@ -467,6 +467,21 @@ if (Meteor.isClient) {
         });
     });
 
+    Template.registerHelper("isMature", function(object){
+        if(object) {
+            var isMature = false;
+            var ages = object.split("-");
+            ages.forEach(function (item) {
+                item.trim();
+            });
+
+            if (ages[0] >= 14)
+                isMature = true;
+
+            return isMature;
+        }
+    });
+
     //TODO register helper for book type key to label values using book specific enum
     //TODO register helper for determination of mature content based on ages listed
     Template.body.helpers({
@@ -534,6 +549,7 @@ if (Meteor.isClient) {
                 }
             });
         },
+
     };
 
 }
