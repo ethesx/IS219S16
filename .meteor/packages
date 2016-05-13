@@ -23,3 +23,5 @@ anonyfox:scrape
 fermuch:cheerio
 harrison:papa-parse
 wenzhixin:bootstrap-table
+accounts-ui
+accounts-password

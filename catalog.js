@@ -498,6 +498,11 @@ if (Meteor.isClient) {
             Utility.clearContent(target);
             Blaze.renderWithData(Template.results, {my: "data"}, target.$("#content").get(0))
         },
+        "click #logout" : function(event, target){
+            event.preventDefault();
+            Meteor.logout();
+            //accountsClient.logout([callback])
+        },
 
     });
 
