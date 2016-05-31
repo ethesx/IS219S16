@@ -120,6 +120,9 @@ var run;
             }
             return result;
         },
+        "createNewUser" : function(user){
+            return Accounts.createUser(user);
+        },
 
     });
 
@@ -502,6 +505,23 @@ if (Meteor.isClient) {
             event.preventDefault();
             Meteor.logout();
             //accountsClient.logout([callback])
+        },
+        "click #createUser" : function(event, target){
+            event.preventDefault();
+
+            var user = {
+                email : target.$("#email").val(),
+                username : target.$("#email").val(),
+                password : target.$("#password").val()
+            };
+            Meteor.call('createNewUser', user, function(error, result){
+                if(error)
+                    console.log(error);
+                else
+                    console.log(result);
+            });
+            //accountsClient.logout([callback])
+
         },
 
     });
