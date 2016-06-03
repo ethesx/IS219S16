@@ -74,21 +74,21 @@ body {
         font-size: 16pt;
     }
 }
-@media (max-width: 768px) {
-   /* #resultBodyDiv{
+/*@media (max-width: 768px) {
+   !* #resultBodyDiv{
         max-height: 28em;
         overflow:auto;
-    }*/
+    }*!
 
-}
+}*/
 
-@media (min-width: 992px) {
-   /* #resultBodyDiv{
+/*@media (min-width: 992px) {
+   !* #resultBodyDiv{
         max-height: 50em;
         overflow:auto;
-    }*/
+    }*!
 
-}
+}*/
 
 #markedButton, #undoButton{
     margin:2em 2em 1em 0;
