@@ -475,7 +475,10 @@ if (Meteor.isClient) {
     //TODO register helper for book type key to label values using book specific enum
     //TODO register helper for determination of mature content based on ages listed
     Template.body.helpers({
-
+        changePass : function(){
+            var result = Session.get("changePass");
+            return result;
+        },
     });
 
     Template.body.events({
@@ -522,6 +525,37 @@ if (Meteor.isClient) {
             });
             //accountsClient.logout([callback])
 
+        },
+        "click #changePass" : function(event, target){
+            event.preventDefault();
+            Accounts.changePassword(
+                target.$("#oldP").val(),
+                target.$("#newP").val(),
+                function(error) {
+                    var result = {};
+                    if (error) {
+                        console.log(error);
+                        result.success = false;
+                        result.reason = error.reason;
+                        Session.set("changePass", result);
+                    }
+                    else {
+                        result.success = true;
+                        result.reason = "Password updated";
+                        Session.set("changePass", result);
+                    }
+                }
+            );
+        },
+        "input #reP" : function(event, target){
+            if(target.$('#newP').val() === event.target.value) {
+                target.$('#changePass').prop("disabled", false);
+                target.$('#rePWarning').addClass('hidden');
+            }
+            else {
+                target.$('#changePass').prop("disabled", true);
+                target.$('#rePWarning').removeClass('hidden');
+            }
         },
 
     });
