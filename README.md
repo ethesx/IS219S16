@@ -1,6 +1,6 @@
 # Catalog app
 
-A Meteor.js application used to retrieve age-level ratings for books from various sources, marking those above age 14 as containing "mature" content.
+A responsive Meteor.js, Bootstrap application created to facilitate age-level rating retrieval for books from various sources, marking those above age 14 as containing "mature" content.
 
 + Designed specifically based on a middle-school use case.
 + Looks up data based on ISBN, book title, barcode, or imports from formatted tab delimited value file.
