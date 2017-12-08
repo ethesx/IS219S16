@@ -7,7 +7,7 @@ var run;
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing
-            //let data = ConstantsTest.websiteData;
+            let data = ConstantsTest.websiteNewData;
 
             if(searchFor) {
                 //TODO add ISBN vs title identifcation
@@ -27,7 +27,8 @@ var run;
                         let url = item.url;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
-                        var data = Scrape.url(url);
+                        //TODO static site data return for testing
+                        //var data = Scrape.url(url);
                         book = getParsedBookData(data, item.type);
 
                         if((book.title !== "" && book.title) || (book.isbn !== "" && book.isbn))
@@ -222,8 +223,12 @@ var run;
         var $ = cheerio.load(result);
         var data = $("#ProductDetailsTab dt, #ProductDetailsTab dd");
         var book = new BNBook();
+
+        //FIXME Correct title retrieval
         book.title =  $("#prodSummary > h1[itemprop]").text();
         book.author = $("span.contributors > a").text();
+
+        //FIXME some items no longer found - lexile, page, pubdate, isbn
         $(data).each(function(i){
             var item = $(this);
             if (item.is("dt")) {
