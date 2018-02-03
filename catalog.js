@@ -6,7 +6,7 @@ if(Meteor.isServer){
 var run;
     Meteor.methods({
         'getData' : function (searchFor){
-            //TODO static site data return for testing
+            //TODO static site data return for testing - uncomment scrape
             let data = ConstantsTest.websiteNewData;
 
             if(searchFor) {
@@ -221,18 +221,16 @@ var run;
     //Parses source specific data
     function parseBNData(result){
         var $ = cheerio.load(result);
-        var data = $("#ProductDetailsTab dt, #ProductDetailsTab dd");
+        var data = $("#ProductDetailsTab th, #ProductDetailsTab td");
         var book = new BNBook();
 
-        //FIXME Correct title retrieval
-        book.title =  $("#prodSummary > h1[itemprop]").text();
-        book.author = $("span.contributors > a").text();
+        book.title =  $("#pdp-header-info > h1[itemprop]").text();
+        book.author = $("span#key-contributors > a").text();
 
-        //FIXME some items no longer found - lexile, page, pubdate, isbn
         $(data).each(function(i){
             var item = $(this);
-            if (item.is("dt")) {
-                book.populateFromSite(item.text(), item.next("dd").text());
+            if (item.is("th")) {
+                book.populateFromSite(item.text(), item.next("td").text());
             }
         });
         return book;
