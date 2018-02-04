@@ -1,0 +1,26 @@
+{
+  "name": "catalog",
+  "version": "1.0.0",
+  "description": "Not much to see here yet. Just working on learning Meteor and setting goals",
+  "main": "catalog.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.26.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethesx/IS219S16.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ethesx/IS219S16/issues"
+  },
+  "homepage": "https://github.com/ethesx/IS219S16#readme"
+}
