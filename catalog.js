@@ -7,7 +7,7 @@ var run;
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing - uncomment scrape
-            let data = ConstantsTest.websiteNewData;
+            //let data = ConstantsTest.websiteNewData;
 
             if(searchFor) {
                 //TODO add ISBN vs title identifcation
@@ -28,7 +28,7 @@ var run;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
                         //TODO static site data return for testing
-                        //var data = Scrape.url(url);
+                        var data = Scrape.url(url);
                         book = getParsedBookData(data, item.type);
 
                         if((book.title !== "" && book.title) || (book.isbn !== "" && book.isbn))
