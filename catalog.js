@@ -75,6 +75,7 @@ var run;
 
                     console.log("finished");
                     console.log("results" + results);
+                    success = true;
                 },
                 error: function(error, file){
                     console.log("There was an error: " + error);
@@ -248,7 +249,9 @@ var run;
             }
         }
     };
-
+    Meteor.publish('tag', function () {
+        return Tag.find({}, {});
+    });
 }
 if(Meteor.isCordova){
 
@@ -377,7 +380,9 @@ if (Meteor.isClient) {
             });
         },
     });
-
+    Tracker.autorun(() => {
+        Meteor.subscribe('tag');
+    });
     Template.upload.helpers({
 
         uploadStatus : function(){
