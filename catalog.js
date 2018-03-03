@@ -1,3 +1,5 @@
+import { HTTP } from 'meteor/http'
+
 Catalog = new Mongo.Collection("catalog"); //All resolved titles
 File = new Mongo.Collection("file"); //Contains original uploaded files
 Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolution
@@ -29,9 +31,10 @@ var run;
                         url += searchFor;
                         //TODO static site data return for testing
                         //var data = Scrape.url(url);
-                        var data = Meteor.http.get(url);
-                        if(data == null) {
-                            throw new Meteor.Error("500", 'No data returned');
+                        var response = HTTP.get(url);
+                        var data = response.content;
+                        if(response === null || response === undefined || response.statusCode === null || response.statusCode != 200) {
+                            throw new Meteor.Error(response.statusCode, response.content);
                         }
 
                         book = getParsedBookData(data, item.type);
@@ -154,9 +157,9 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
-                        if(error.error == "500") {
+                        if(error.error != "200") {
                             delay = 300000;
-                            console.log("NULL data returned from site - trying again in " + delay/1000 + " seconds");
+                            console.log("Trying request again in " + delay/1000 + " seconds");
                         }else{
                             Tag.update(record._id, {$set : {processed : true, error : error}});
                             console.log("Set record as processed");

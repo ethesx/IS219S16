@@ -27,3 +27,4 @@ standard-minifier-js@2.3.1
 shell-server@0.3.1
 dynamic-import@0.3.0
 accounts-base@1.4.2
+http
