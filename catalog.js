@@ -32,9 +32,8 @@ var run;
                         //TODO static site data return for testing
                         //var data = Scrape.url(url);
                         var response = HTTP.get(url);
-                        console.log(response);
-                        console.log(response.statusCode);
-                        console.log(response.content);
+                        console.log("Response statusCode : " + response.statusCode);
+
 
                         var data = response.content;
                         if(response === null || response === undefined || response.statusCode === null || response.statusCode != 200) {
@@ -143,7 +142,8 @@ var run;
 
     function resolveTitles(){
 
-        var delay = Math.round(Math.random() * 10000); // from 1-10sec random intervals
+        //var delay = Math.round(Math.random() * 10000); // from 1-10sec random intervals
+        var delay = Math.round(Math.random() * 1000); // from 1-10sec random intervals
         //FIXME FOR TESTING
         //var delay = 1000;
         console.log("Will try resolving a title in " + delay/1000 + " seconds");
