@@ -32,6 +32,10 @@ var run;
                         //TODO static site data return for testing
                         //var data = Scrape.url(url);
                         var response = HTTP.get(url);
+                        console.log(response);
+                        console.log(response.statusCode);
+                        console.log(response.content);
+
                         var data = response.content;
                         if(response === null || response === undefined || response.statusCode === null || response.statusCode != 200) {
                             throw new Meteor.Error(response.statusCode, response.content);
@@ -158,8 +162,8 @@ var run;
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
                         if(error.error != "200") {
-                            delay = 300000;
-                            console.log("Trying request again in " + delay/1000 + " seconds");
+                            //delay = 300000;
+                            console.log("Will try request again");
                         }else{
                             Tag.update(record._id, {$set : {processed : true, error : error}});
                             console.log("Set record as processed");
