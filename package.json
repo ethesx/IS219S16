@@ -7,7 +7,8 @@
     "lib": "lib"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.39"
+    "@babel/runtime": "^7.0.0-beta.39",
+    "bcrypt": "^1.0.3"
   },
   "devDependencies": {},
   "scripts": {
