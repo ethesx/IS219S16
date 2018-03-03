@@ -148,8 +148,11 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
+                        if(error == undefined)
+                            error = "unknown";
+
                         Tag.update(record._id, {$set : {processed : true, error : error}});
-                        Meteor.clearTimeout(this);
+                        //Meteor.clearTimeout(this);
                         return true;
                     }
                     else {
