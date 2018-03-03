@@ -29,6 +29,7 @@ var run;
                         url += searchFor;
                         //TODO static site data return for testing
                         var data = Scrape.url(url);
+                        console.log(data);
                         book = getParsedBookData(data, item.type);
 
                         if((book.title !== "" && book.title) || (book.isbn !== "" && book.isbn))
