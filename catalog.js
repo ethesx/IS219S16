@@ -146,7 +146,7 @@ var run;
                 //TODO create service for getData call - this is our second reference
                 Meteor.call("getData", record.isbn, function (error, result) {
                     if (error) {
-                        console.log("getDataError" + error.reason);
+                        console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
                         Tag.update(record._id, {$set : {processed : true, error : error}});
                         Meteor.clearTimeout(this);
