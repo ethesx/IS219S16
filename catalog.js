@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http'
 
 Catalog = new Mongo.Collection("catalog"); //All resolved titles
