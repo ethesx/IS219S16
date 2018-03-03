@@ -29,7 +29,10 @@ var run;
                         url += searchFor;
                         //TODO static site data return for testing
                         var data = Scrape.url(url);
-                        console.log(data);
+                        if(data == null) {
+                            new Meteor.Error("500", 'No data returned');
+                        }
+
                         book = getParsedBookData(data, item.type);
 
                         if((book.title !== "" && book.title) || (book.isbn !== "" && book.isbn))
@@ -149,11 +152,15 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
-                        if(error == undefined)
-                            error = "unknown";
+                        if(error == "500") {
+                            delay = 300000;
+                            console.log("NULL data returned from site - trying again in " + delay/1000 + " seconds");
+                        }else{
+                            Tag.update(record._id, {$set : {processed : true, error : error}});
+                            console.log("Set record as processed");
+                        }
 
-                        Tag.update(record._id, {$set : {processed : true, error : error}});
-                        console.log("Set record as processed");
+
                         //Meteor.clearTimeout(this);
                         //return true;
                         resolveTitles();
