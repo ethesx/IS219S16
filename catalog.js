@@ -28,7 +28,8 @@ var run;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
                         //TODO static site data return for testing
-                        var data = Scrape.url(url);
+                        //var data = Scrape.url(url);
+                        var data = Meteor.http.get(url);
                         if(data == null) {
                             throw new Meteor.Error("500", 'No data returned');
                         }
@@ -153,7 +154,7 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
-                        if(error == "500") {
+                        if(error.error == "500") {
                             delay = 300000;
                             console.log("NULL data returned from site - trying again in " + delay/1000 + " seconds");
                         }else{
