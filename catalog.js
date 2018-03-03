@@ -30,7 +30,7 @@ var run;
                         //TODO static site data return for testing
                         var data = Scrape.url(url);
                         if(data == null) {
-                            new Meteor.Error("500", 'No data returned');
+                            throw new Meteor.Error("500", 'No data returned');
                         }
 
                         book = getParsedBookData(data, item.type);
@@ -101,6 +101,7 @@ var run;
             else if(start || (!run || run.ontimeout === null)) {
                 return resolveTitles();
             }
+
         },
         'latestFileId' : function(){
             return File.find({},{sort : {_id : -1}, limit : 1}).fetch()[0]._id;
