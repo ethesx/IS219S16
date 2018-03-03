@@ -148,12 +148,14 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
-                        if(error == undefined)
+                        if(error === undefined)
                             error = "unknown";
 
                         Tag.update(record._id, {$set : {processed : true, error : error}});
+                        console.log("Set record as processed");
                         //Meteor.clearTimeout(this);
-                        return true;
+                        //return true;
+                        resolveTitles();
                     }
                     else {
                         console.log("getData successful callback");
