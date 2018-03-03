@@ -142,7 +142,7 @@ var run;
 
 
             if(record) {
-                console.log("Resolving a title : record.isbn");
+                console.log("Resolving a title : " + record.isbn);
                 //TODO create service for getData call - this is our second reference
                 Meteor.call("getData", record.isbn, function (error, result) {
                     if (error) {
