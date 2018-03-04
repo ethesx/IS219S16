@@ -180,7 +180,7 @@ var resolve;
                     console.log("getDataError : " + error.reason);
                     //TODO temporary - pull aggregate or highest age
 
-                    if(error.error == "Error: read ECONNRESET") {
+                    if(error.reason == "Error: read ECONNRESET") {
                         console.log("Will try request again");
                     }
                     else{
