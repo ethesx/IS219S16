@@ -37,6 +37,9 @@ var run;
                         }
                         catch(e){
                             console.log(e);
+                            Meteor.call("toggleResolveTitles", false);
+                            console.log("Trying again in 5 min");
+                            resolveTitles(300000);
                             throw new Meteor.Error("500", e);
                         }
                         console.log("Response statusCode : " + response.statusCode);
@@ -147,10 +150,12 @@ var run;
 
     });
 
-    function resolveTitles(){
+    function resolveTitles(delay) {
 
         //var delay = Math.round(Math.random() * 10000); // from 1-10sec random intervals
-        var delay = Math.round(Math.random() * 1000); // from 1-10sec random intervals
+        if (!delay) {
+            delay = Math.round(Math.random() * 1000); // from 1-10sec random intervals
+        }
         //FIXME FOR TESTING
         //var delay = 1000;
         console.log("Will try resolving a title in " + delay/1000 + " seconds");
