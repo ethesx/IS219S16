@@ -41,6 +41,8 @@ resolveTitles();
                             console.log(e);
                             console.log("Pausing for 5 min");
                             Meteor.call("toggleResolveTitles", true, 300000);
+                            console.log("Google request : " + HTTP.get("http://google.com").statusCode);
+                            console.log("IP : " + HTTP.get("https://api.ipify.org").content);
                             throw new Meteor.Error("500", e);
                         }
                         console.log("Response statusCode : " + response.statusCode);
