@@ -32,7 +32,12 @@ var run;
                         url += searchFor;
                         //TODO static site data return for testing
                         //var data = Scrape.url(url);
-                        var response = HTTP.get(url);
+                        try {
+                            var response = HTTP.get(url);
+                        }
+                        catch(e){
+                            throw new Meteor.Error("500", e);
+                        }
                         console.log("Response statusCode : " + response.statusCode);
 
 
