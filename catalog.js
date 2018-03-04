@@ -198,7 +198,7 @@ var resolve;
 
                 }
             });
-            resolveTitles();
+            resolveTitles(delay);
         }
         else {
             Meteor.clearTimeout(run);
