@@ -108,11 +108,11 @@ var run;
         },
 
         'toggleResolveTitles' : function(start){
-            if(!start || (run && run.ontimeout === undefined)) {
+            if(!start || (run && run._onTimeout === undefined)) {
                 Meteor.clearTimeout(run);
                 return false;
             }
-            else if(start || (!run || run.ontimeout === null)) {
+            else if(start || (!run || run._onTimeout === null)) {
                 return resolveTitles();
             }
 
@@ -168,7 +168,11 @@ var run;
                     if (error) {
                         console.log("getDataError : " + error.reason);
                         //TODO temporary - pull aggregate or highest age
-                        if(error.error != "200") {
+                        if(error === undefined){
+                            Tag.update(record._id, {$set : {processed : true, error : "No data"}});
+                            console.log("Set record as processed");
+                        }
+                        else if(error.error != "200") {
                             //delay = 300000;
                             console.log("Will try request again");
                         }else{
