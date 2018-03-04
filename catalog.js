@@ -39,6 +39,7 @@ var resolve;
                         }
                         catch(e){
                             console.log(e);
+                            console.log("Pausing for 5 min");
                             Meteor.call("toggleResolveTitles", true, 300000);
                             throw new Meteor.Error("500", e);
                         }
