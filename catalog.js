@@ -7,6 +7,8 @@ Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolutio
 
 if(Meteor.isServer){
 var run;
+var delay;
+var resolve;
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing - uncomment scrape
@@ -30,21 +32,19 @@ var run;
                         let url = item.url;
                         url = new Buffer(url, 'base64').toString();
                         url += searchFor;
-                        //TODO static site data return for testing
-                        //var data = Scrape.url(url);
+
                         try {
+                            //TODO static site data return for testing
                             var response = HTTP.get(url);
                         }
                         catch(e){
                             console.log(e);
-                            Meteor.call("toggleResolveTitles", false);
-                            console.log("Trying again in 5 min");
-                            resolveTitles(300000);
+                            Meteor.call("toggleResolveTitles", true, 300000);
                             throw new Meteor.Error("500", e);
                         }
                         console.log("Response statusCode : " + response.statusCode);
 
-
+                        //TODO static site data return for testing
                         var data = response.content;
                         if(response === null || response === undefined || response.statusCode === null || response.statusCode != 200) {
                             throw new Meteor.Error(response.statusCode, response.content);
@@ -110,13 +110,15 @@ var run;
             return success;
         },
 
-        'toggleResolveTitles' : function(start){
-            if(!start || (run && run._onTimeout === undefined)) {
-                Meteor.clearTimeout(run);
-                return false;
+        'toggleResolveTitles' : function(start, passedDelay){
+
+            Meteor.clearTimeout(run);
+
+            if(start) {
+                return resolveTitles(passedDelay);
             }
-            else if(start || (!run || run._onTimeout === null)) {
-                return resolveTitles();
+            else{
+                return false;
             }
 
         },
@@ -150,62 +152,59 @@ var run;
 
     });
 
-    function resolveTitles(delay) {
+    function resolveTitles(passedDelay) {
 
-        //var delay = Math.round(Math.random() * 10000); // from 1-10sec random intervals
-        if (!delay) {
-            delay = Math.round(Math.random() * 1000); // from 1-10sec random intervals
+        if (!passedDelay) {
+            delay = 500;
         }
-        //FIXME FOR TESTING
-        //var delay = 1000;
-        console.log("Will try resolving a title in " + delay/1000 + " seconds");
-        run = Meteor.setTimeout(function () {
-
-            //TODO work on returning title if no isbn once title resolution is in place
-            //TODO setup way to rerun titles with errors
-            var record = Tag.findOne({$and : [{processed : false, error : {$exists : false}}]});
+        else{
+            delay = passedDelay;
+        }
 
 
-            if(record) {
-                console.log("Resolving a title : " + record.isbn);
-                //TODO create service for getData call - this is our second reference
-                Meteor.call("getData", record.isbn, function (error, result) {
-                    if (error) {
-                        console.log("getDataError : " + error.reason);
-                        //TODO temporary - pull aggregate or highest age
-                        if(error === undefined){
-                            Tag.update(record._id, {$set : {processed : true, error : "No data"}});
-                            console.log("Set record as processed");
-                        }
-                        else if(error.error != "200") {
-                            //delay = 300000;
-                            console.log("Will try request again");
-                        }else{
-                            Tag.update(record._id, {$set : {processed : true, error : error}});
-                            console.log("Set record as processed");
-                        }
+        run = Meteor.setTimeout(lookupRecord, delay);
+    };
+
+    function lookupRecord() {
+        //console.log("Will try resolving a title in " + delay/1000 + " seconds");
+        //TODO work on returning title if no isbn once title resolution is in place
+        //TODO setup way to rerun titles with errors
+        var record = Tag.findOne({$and : [{processed : false, error : {$exists : false}}]});
 
 
-                        //Meteor.clearTimeout(this);
-                        //return true;
-                        resolveTitles();
+        if(record) {
+            console.log("Resolving a title : " + record.isbn);
+            //TODO create service for getData call - this is our second reference
+            Meteor.call("getData", record.isbn, function (error, result) {
+                if (error) {
+                    console.log("getDataError : " + error.reason);
+                    //TODO temporary - pull aggregate or highest age
+
+                    if(error.error == "Error: read ECONNRESET") {
+                        console.log("Will try request again");
                     }
-                    else {
-                        console.log("getData successful callback");
-                        if(result)
-                            Tag.update(record._id, {$set : {processed : true, age : result.books[0].age}});
-                        else
-                            Tag.update(record._id, {$set : {processed : true, error : "No results"}});
-                        resolveTitles();
+                    else{
+                        error = error.reason === undefined ? "No data for title" : error;
+                        Tag.update(record._id, {$set : {processed : true, error : error}});
+                        console.log("Set record as processed");
                     }
-                });
-            }
-            else {
-                Meteor.clearTimeout(this);
-                console.log("No titles left to resolve - work complete");
-                return true;
-            }
-        }, delay);
+                }
+                else {
+                    console.log("getData successful callback");
+                    if(result)
+                        Tag.update(record._id, {$set : {processed : true, age : result.books[0].age}});
+                    else
+                        Tag.update(record._id, {$set : {processed : true, error : "No results"}});
+
+                }
+            });
+            resolveTitles();
+        }
+        else {
+            Meteor.clearTimeout(run);
+            console.log("No titles left to resolve - work complete");
+            return true;
+        }
     };
 
     function loadparsedTitles(result) {
