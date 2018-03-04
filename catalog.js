@@ -8,7 +8,7 @@ Tag = new Mongo.Collection("tag"); //Contains parsed titles which need resolutio
 if(Meteor.isServer){
 var run;
 var delay;
-var resolve;
+resolveTitles();
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing - uncomment scrape
