@@ -36,6 +36,7 @@ var run;
                             var response = HTTP.get(url);
                         }
                         catch(e){
+                            console.log(e);
                             throw new Meteor.Error("500", e);
                         }
                         console.log("Response statusCode : " + response.statusCode);
