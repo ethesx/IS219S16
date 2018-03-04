@@ -9,6 +9,8 @@ if(Meteor.isServer){
 var run;
 var delay;
 resolveTitles();
+var IP = HTTP.get("https://api.ipify.org").content;
+
     Meteor.methods({
         'getData' : function (searchFor){
             //TODO static site data return for testing - uncomment scrape
@@ -41,10 +43,12 @@ resolveTitles();
                             console.log(e);
                             console.log("Pausing for 5 min");
                             Meteor.call("toggleResolveTitles", true, 300000);
-                            console.log("Google request : " + HTTP.get("http://google.com").statusCode);
-                            console.log("IP : " + HTTP.get("https://api.ipify.org").content);
+
+                            console.log("Restarting");
+                            HTTP.del(Meteor.settings.API_URL, Constants.resetOptions);
                             throw new Meteor.Error("500", e);
                         }
+                        console.log("Our IP : " + IP);
                         console.log("Response statusCode : " + response.statusCode);
 
                         //TODO static site data return for testing
