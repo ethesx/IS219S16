@@ -41,8 +41,6 @@ var IP = HTTP.get("https://api.ipify.org").content;
                         }
                         catch(e){
                             console.log(e);
-                            console.log("Pausing for 5 min");
-                            Meteor.call("toggleResolveTitles", true, 300000);
 
                             console.log("Restarting");
                             HTTP.del(Meteor.settings.API_URL, Constants.resetOptions);
