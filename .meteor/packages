@@ -28,3 +28,5 @@ shell-server@0.3.1
 dynamic-import@0.3.0
 accounts-base@1.4.2
 http
+huaming:js-xlsx
+pfafman:filesaver
